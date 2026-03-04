@@ -1,0 +1,8 @@
+{
+    "java.project.sourcePaths": [
+        "Demo_TaxReturn_Systems/oop/project",
+        "src/com/oop/project"
+    ],
+    "java.project.outputPath": "bin",
+    "java.debug.settings.onBuildFailureProceed": true
+}

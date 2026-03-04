@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(dir:*)",
+      "Bash(ls:*)",
+      "Bash(del /f \"D:\\\\template-project-main \\(1\\)\\\\clients.dat\" \"D:\\\\template-project-main \\(1\\)\\\\users.dat\")",
+      "Bash(powershell -Command \"Remove-Item ''D:\\\\template-project-main \\(1\\)\\\\clients.dat'' -ErrorAction SilentlyContinue; Remove-Item ''D:\\\\template-project-main \\(1\\)\\\\users.dat'' -ErrorAction SilentlyContinue; Write-Host ''Done''\")",
+      "Bash(javac:*)",
+      "Bash(java -cp bin com.oop.project.Main:*)",
+      "Bash(powershell -Command \"cd ''D:\\\\template-project-main \\(1\\)''; java -cp bin com.oop.project.Main; Start-Sleep 3\")",
+      "Bash(claude --list-sessions:*)",
+      "Bash(python3:*)",
+      "Bash(echo:*)"
+    ]
+  }
+}

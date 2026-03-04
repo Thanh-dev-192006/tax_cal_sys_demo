@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-encoding", "UTF-8",
+                "-d", "bin",
+                "src/com/oop/project/Main.java",
+                "src/com/oop/project/exception/*.java",
+                "src/com/oop/project/model/*.java",
+                "src/com/oop/project/repository/*.java",
+                "src/com/oop/project/service/*.java",
+                "src/com/oop/project/ui/*.java",
+                "src/com/oop/project/util/*.java"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$javac"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "tax_cal_sys_demo_8bac75f3"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.oop.project.Main",
+            "classPaths": [
+                "${workspaceFolder}/bin"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build"
+        }
+    ]
+}
