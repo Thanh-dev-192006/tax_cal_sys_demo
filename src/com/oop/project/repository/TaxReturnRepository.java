@@ -1,72 +1,138 @@
 package com.oop.project.repository;
 
 import com.oop.project.model.TaxReturn;
-import com.oop.project.util.FileUtil;
-
-import java.time.LocalDate;
+import com.oop.project.util.DatabaseUtil;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * TaxReturnRepository - Lưu/đọc tờ khai thuế từ returns.txt (pipe-separated UTF-8)
- *
- * Format mỗi dòng:
- *   clientId|filingDate|taxLiability|status|maritalStatus
- * Ví dụ:
- *   903-73-9276|2025-04-28|1250000.00|Da nop|MARRIED
+ * TaxReturnRepository - Su dung MySQL
  */
 public class TaxReturnRepository {
-
-    private static final String FILE_NAME = "returns.txt";
-    private static final String SEP = "|";
-
+    
+    /**
+     * Luu danh sach tax returns
+     */
     public void saveTaxReturns(List<TaxReturn> taxReturns) {
-        List<String> lines = new ArrayList<>();
-        for (TaxReturn tr : taxReturns) {
-            lines.add(String.join(SEP,
-                    s(tr.getClientId()),
-                    tr.getFilingDate().toString(),
-                    String.format("%.2f", tr.getTaxLiability()),
-                    s(tr.getStatus()),
-                    s(tr.getMaritalStatus())));
+        String sql = "INSERT INTO TaxReturns (client_id, filing_date, tax_liability, status, marital_status) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            for (TaxReturn tr : taxReturns) {
+                stmt.setString(1, tr.getClientId());
+                stmt.setDate(2, Date.valueOf(tr.getFilingDate()));
+                stmt.setDouble(3, tr.getTaxLiability());
+                stmt.setString(4, tr.getStatus());
+                stmt.setString(5, tr.getMaritalStatus());
+                stmt.addBatch();
+            }
+            
+            stmt.executeBatch();
+            System.out.println("Saved " + taxReturns.size() + " tax returns");
+            
+        } catch (SQLException e) {
+            System.err.println("Error saving tax returns: " + e.getMessage());
+            e.printStackTrace();
         }
-        FileUtil.writeLines(lines, FILE_NAME);
     }
-
+    
+    /**
+     * Load tat ca tax returns
+     */
     public List<TaxReturn> loadTaxReturns() {
-        List<String> lines = FileUtil.readLines(FILE_NAME);
-        List<TaxReturn> returns = new ArrayList<>();
-        for (String line : lines) {
-            String[] p = line.split("\\|", -1);
-            if (p.length >= 5) {
-                try {
-                    LocalDate date  = LocalDate.parse(p[1]);
-                    double tax      = Double.parseDouble(p[2]);
-                    returns.add(new TaxReturn(p[0], date, tax, p[3], p[4]));
-                } catch (Exception ignored) {
-                    // Skip malformed lines
+        List<TaxReturn> taxReturns = new ArrayList<>();
+        String sql = "SELECT * FROM TaxReturns ORDER BY filing_date DESC";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                TaxReturn tr = new TaxReturn(
+                    rs.getString("client_id"),
+                    rs.getDate("filing_date").toLocalDate(),
+                    rs.getDouble("tax_liability"),
+                    rs.getString("status"),
+                    rs.getString("marital_status")
+                );
+                taxReturns.add(tr);
+            }
+            
+            System.out.println("Loaded " + taxReturns.size() + " tax returns");
+            
+        } catch (SQLException e) {
+            System.err.println("Error loading tax returns: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return taxReturns;
+    }
+    
+    /**
+     * Them 1 tax return
+     */
+    public void addTaxReturn(TaxReturn taxReturn) {
+        String sql = "INSERT INTO TaxReturns (client_id, filing_date, tax_liability, status, marital_status) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, taxReturn.getClientId());
+            stmt.setDate(2, Date.valueOf(taxReturn.getFilingDate()));
+            stmt.setDouble(3, taxReturn.getTaxLiability());
+            stmt.setString(4, taxReturn.getStatus());
+            stmt.setString(5, taxReturn.getMaritalStatus());
+            
+            stmt.executeUpdate();
+            System.out.println("Added tax return for client: " + taxReturn.getClientId());
+            
+        } catch (SQLException e) {
+            System.err.println("Error adding tax return: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Tim tax returns theo client ID
+     */
+    public List<TaxReturn> findTaxReturnsByClientId(String clientId) {
+        List<TaxReturn> taxReturns = new ArrayList<>();
+        String sql = "SELECT * FROM TaxReturns WHERE client_id = ? ORDER BY filing_date DESC";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, clientId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    TaxReturn tr = new TaxReturn(
+                        rs.getString("client_id"),
+                        rs.getDate("filing_date").toLocalDate(),
+                        rs.getDouble("tax_liability"),
+                        rs.getString("status"),
+                        rs.getString("marital_status")
+                    );
+                    taxReturns.add(tr);
                 }
             }
+            
+        } catch (SQLException e) {
+            System.err.println("Error finding tax returns: " + e.getMessage());
+            e.printStackTrace();
         }
-        return returns;
+        
+        return taxReturns;
     }
-
-    public void addTaxReturn(TaxReturn taxReturn) {
-        List<TaxReturn> all = loadTaxReturns();
-        all.add(taxReturn);
-        saveTaxReturns(all);
-    }
-
-    public List<TaxReturn> findTaxReturnsByClientId(String clientId) {
-        return loadTaxReturns().stream()
-                .filter(tr -> tr.getClientId().equals(clientId))
-                .collect(Collectors.toList());
-    }
-
+    
+    /**
+     * Lay tat ca tax returns
+     */
     public List<TaxReturn> findAllTaxReturns() {
         return loadTaxReturns();
     }
-
-    private String s(String v) { return v == null ? "" : v; }
 }
