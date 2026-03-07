@@ -1,59 +1,153 @@
 package com.oop.project.repository;
 
 import com.oop.project.model.User;
-import com.oop.project.util.FileUtil;
-
+import com.oop.project.util.DatabaseUtil;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UserRepository - Lưu/đọc tài khoản từ users.txt (pipe-separated UTF-8)
- *
- * Format mỗi dòng:
- *   staffId|username|password|role|fullName|email|phoneNumber
- * Ví dụ:
- *   NV001|admin|admin123|ADMIN|Nguyen Van Quan Tri|admin@tuvanthe.vn|0901000001
+ * UserRepository - Su dung MySQL thay vi file serialization
  */
 public class UserRepository {
-
-    private static final String FILE_NAME = "users.txt";
-    private static final String SEP = "|";
-
+    
+    /**
+     * Luu danh sach users vao database
+     * @param users Danh sach users can luu
+     */
     public void saveUsers(List<User> users) {
-        List<String> lines = new ArrayList<>();
-        for (User u : users) {
-            lines.add(String.join(SEP,
-                    s(u.getStaffId()),
-                    s(u.getUsername()),
-                    s(u.getPassword()),
-                    s(u.getRole()),
-                    s(u.getFullName()),
-                    s(u.getEmail()),
-                    s(u.getPhoneNumber())));
-        }
-        FileUtil.writeLines(lines, FILE_NAME);
-    }
-
-    public List<User> loadUsers() {
-        List<String> lines = FileUtil.readLines(FILE_NAME);
-        List<User> users = new ArrayList<>();
-        for (String line : lines) {
-            String[] p = line.split("\\|", -1);
-            if (p.length >= 7) {
-                users.add(new User(p[0], p[1], p[2], p[3], p[4], p[5], p[6]));
-            } else if (p.length >= 3) {
-                // Legacy 3-field format (username|password|role)
-                users.add(new User(p[0], p[1], p[2]));
+        String sql = "INSERT INTO Users (staff_id, username, password, role, full_name, email, phone_number) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                    "password = VALUES(password), " +
+                    "role = VALUES(role), " +
+                    "full_name = VALUES(full_name), " +
+                    "email = VALUES(email), " +
+                    "phone_number = VALUES(phone_number)";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            for (User user : users) {
+                stmt.setString(1, user.getStaffId());
+                stmt.setString(2, user.getUsername());
+                stmt.setString(3, user.getPassword());
+                stmt.setString(4, user.getRole());
+                stmt.setString(5, user.getFullName());
+                stmt.setString(6, user.getEmail());
+                stmt.setString(7, user.getPhoneNumber());
+                stmt.addBatch();
             }
+            
+            stmt.executeBatch();
+            System.out.println("Saved " + users.size() + " users to database");
+            
+        } catch (SQLException e) {
+            System.err.println("Error saving users: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+    
+    /**
+     * Load tat ca users tu database
+     * @return Danh sach users
+     */
+    public List<User> loadUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY staff_id";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                User user = new User(
+                    rs.getString("staff_id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role"),
+                    rs.getString("full_name"),
+                    rs.getString("email"),
+                    rs.getString("phone_number")
+                );
+                users.add(user);
+            }
+            
+            System.out.println("Loaded " + users.size() + " users from database");
+            
+        } catch (SQLException e) {
+            System.err.println("Error loading users: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         return users;
     }
-
+    
+    /**
+     * Tim user theo username
+     * @param username Username can tim
+     * @return User neu tim thay, null neu khong
+     */
     public User findUserByUsername(String username) {
-        return loadUsers().stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst().orElse(null);
+        String sql = "SELECT * FROM Users WHERE username = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                        rs.getString("staff_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("phone_number")
+                    );
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error finding user: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
     }
-
-    private String s(String v) { return v == null ? "" : v; }
+    
+    /**
+     * Them 1 user moi
+     * @param user User can them
+     */
+    public void addUser(User user) {
+        List<User> users = new ArrayList<>();
+        users.add(user);
+        saveUsers(users);
+    }
+    
+    /**
+     * Xoa user theo username
+     * @param username Username can xoa
+     */
+    public void deleteUser(String username) {
+        String sql = "DELETE FROM Users WHERE username = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, username);
+            int rows = stmt.executeUpdate();
+            
+            if (rows > 0) {
+                System.out.println("Deleted user: " + username);
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error deleting user: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
