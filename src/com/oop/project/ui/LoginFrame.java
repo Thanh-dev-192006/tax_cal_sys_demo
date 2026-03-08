@@ -13,10 +13,10 @@ import java.awt.event.KeyEvent;
 
 public class LoginFrame extends JFrame {
 
-    private JTextField    usernameField;
+    private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton        loginButton;
-    private JCheckBox      showPasswordCheck;
+    private JButton loginButton;
+    private JCheckBox showPasswordCheck;
     private final AuthenticationService authService;
 
     public LoginFrame() {
@@ -45,11 +45,11 @@ public class LoginFrame extends JFrame {
         lblCompany.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel lblTitle = new JLabel("Tax Return Management System");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblTitle.setFont(AppTheme.FONT_TITLE);
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JLabel lblSub = new JLabel("Version 1.0  —  Project 6  |  DSAI1004");
+        JLabel lblSub = new JLabel("Version 1.0 | DSAI1004 Project 6");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblSub.setForeground(new Color(0xBB, 0xDE, 0xFB));
         lblSub.setHorizontalAlignment(SwingConstants.CENTER);
@@ -67,29 +67,36 @@ public class LoginFrame extends JFrame {
         card.setBorder(new EmptyBorder(30, 40, 30, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 1;
-        gbc.weightx   = 1.0;
-        gbc.gridx     = 0;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
 
         JLabel lblLogin = new JLabel("Sign In");
         lblLogin.setFont(AppTheme.FONT_SUBTITLE);
         lblLogin.setForeground(AppTheme.PRIMARY_BLUE);
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 18, 0);
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 18, 0);
         card.add(lblLogin, gbc);
 
-        gbc.gridy = 1; gbc.insets = new Insets(4, 0, 2, 0);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(4, 0, 2, 0);
         card.add(fieldLabel("Username:"), gbc);
 
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 10, 0);
         usernameField = styledField(300, 36);
+        usernameField.putClientProperty("JTextField.placeholderText", "Enter username...");
         card.add(usernameField, gbc);
 
-        gbc.gridy = 3; gbc.insets = new Insets(4, 0, 2, 0);
+        gbc.gridy = 3;
+        gbc.insets = new Insets(4, 0, 2, 0);
         card.add(fieldLabel("Password:"), gbc);
 
-        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 0, 4, 0);
         passwordField = new JPasswordField();
+        passwordField.putClientProperty("JTextField.placeholderText", "Enter password...");
         passwordField.setFont(AppTheme.FONT_BODY);
         passwordField.setPreferredSize(new Dimension(300, 36));
         passwordField.setBorder(BorderFactory.createCompoundBorder(
@@ -97,15 +104,17 @@ public class LoginFrame extends JFrame {
                 new EmptyBorder(4, 8, 4, 8)));
         card.add(passwordField, gbc);
 
-        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 18, 0);
+        gbc.gridy = 5;
+        gbc.insets = new Insets(0, 0, 18, 0);
         showPasswordCheck = new JCheckBox("Show password");
         showPasswordCheck.setFont(AppTheme.FONT_SMALL);
         showPasswordCheck.setOpaque(false);
-        showPasswordCheck.addActionListener(e ->
-                passwordField.setEchoChar(showPasswordCheck.isSelected() ? (char) 0 : '*'));
+        showPasswordCheck
+                .addActionListener(e -> passwordField.setEchoChar(showPasswordCheck.isSelected() ? (char) 0 : '*'));
         card.add(showPasswordCheck, gbc);
 
-        gbc.gridy = 6; gbc.insets = new Insets(4, 0, 10, 0);
+        gbc.gridy = 6;
+        gbc.insets = new Insets(4, 0, 10, 0);
         loginButton = new JButton("LOGIN");
         loginButton.setFont(AppTheme.FONT_BUTTON);
         loginButton.setBackground(AppTheme.PRIMARY_BLUE);
@@ -116,7 +125,8 @@ public class LoginFrame extends JFrame {
         loginButton.addActionListener(e -> performLogin());
         card.add(loginButton, gbc);
 
-        gbc.gridy = 7; gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridy = 7;
+        gbc.insets = new Insets(0, 0, 0, 0);
         JLabel hint = new JLabel("Admin: admin / admin123     Staff: nhanvien1 / Staff@123");
         hint.setFont(new Font("Segoe UI", Font.ITALIC, 10));
         hint.setForeground(AppTheme.TEXT_SECONDARY);
@@ -134,7 +144,7 @@ public class LoginFrame extends JFrame {
 
         JPanel cardWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         cardWrapper.setBackground(AppTheme.BACKGROUND);
-        cardWrapper.setBorder(new EmptyBorder(20, 32, 0, 32));
+        cardWrapper.setBorder(new EmptyBorder(40, 50, 40, 50));
         cardWrapper.add(card);
 
         root.add(header, BorderLayout.NORTH);
@@ -144,8 +154,10 @@ public class LoginFrame extends JFrame {
 
         // Enter key triggers login
         KeyAdapter enter = new KeyAdapter() {
-            @Override public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) performLogin();
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                    performLogin();
             }
         };
         usernameField.addKeyListener(enter);

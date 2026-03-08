@@ -14,6 +14,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame(User user) {
         this.currentUser = user;
+        AppTheme.applyFlatLafCustomizations();
         initializeUI();
     }
 
@@ -32,7 +33,7 @@ public class MainFrame extends JFrame {
 
         // ── TABS ────────────────────────────────────────────────────
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
-        tabs.setFont(AppTheme.FONT_BODY);
+        tabs.setFont(AppTheme.FONT_SUBTITLE);
         tabs.setBackground(AppTheme.BACKGROUND);
 
         DashboardPanel dashboardPanel = new DashboardPanel();
@@ -48,13 +49,15 @@ public class MainFrame extends JFrame {
         tabs.addTab("  Returns  ", returnsPanel);
 
         if (currentUser != null && "ADMIN".equals(currentUser.getRole())) {
-            tabs.addTab("  Administration  ", buildAdminPlaceholder());
+            tabs.addTab("  Administration  ", new AdministrationPanel(currentUser));
         }
 
         tabs.addChangeListener(e -> {
             Component sel = tabs.getSelectedComponent();
-            if (sel == returnsPanel)   returnsPanel.loadData();
-            else if (sel == dashboardPanel) dashboardPanel.refresh();
+            if (sel == returnsPanel)
+                returnsPanel.loadData();
+            else if (sel == dashboardPanel)
+                dashboardPanel.refresh();
         });
 
         root.add(tabs, BorderLayout.CENTER);
@@ -77,8 +80,8 @@ public class MainFrame extends JFrame {
         String fullName = (currentUser != null
                 && currentUser.getFullName() != null
                 && !currentUser.getFullName().isEmpty())
-                ? currentUser.getFullName()
-                : (currentUser != null ? currentUser.getUsername() : "?");
+                        ? currentUser.getFullName()
+                        : (currentUser != null ? currentUser.getUsername() : "?");
         String roleDisplay = (currentUser != null) ? currentUser.getRole() : "";
 
         JLabel lblUser = new JLabel(fullName + "  (" + roleDisplay + ")");
@@ -114,36 +117,33 @@ public class MainFrame extends JFrame {
     }
 
     private JPanel buildStatusBar() {
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 4));
+        JPanel bar = new JPanel(new BorderLayout());
         bar.setBackground(new Color(0xEC, 0xEF, 0xF5));
-        bar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, AppTheme.BORDER_COLOR));
+        bar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, AppTheme.BORDER_COLOR),
+                new EmptyBorder(4, 12, 4, 12)));
 
-        JLabel status = new JLabel(
-                "Ready  |  Vietnam Personal Income Tax System  |  Filing Deadline: April 30 annually");
-        status.setFont(AppTheme.FONT_SMALL);
-        status.setForeground(AppTheme.TEXT_SECONDARY);
-        bar.add(status);
+        JLabel statusLeft = new JLabel("Ready  |  Vietnam Personal Income Tax System");
+        statusLeft.setFont(AppTheme.FONT_SMALL);
+        statusLeft.setForeground(AppTheme.TEXT_SECONDARY);
+
+        JLabel statusRight = new JLabel("");
+        statusRight.setFont(AppTheme.FONT_SMALL);
+        statusRight.setForeground(AppTheme.TEXT_SECONDARY);
+
+        Runnable updateTime = () -> {
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd HH:mm:ss");
+            statusRight.setText(now.format(formatter));
+        };
+        updateTime.run();
+
+        Timer timer = new Timer(60000, e -> updateTime.run());
+        timer.start();
+
+        bar.add(statusLeft, BorderLayout.WEST);
+        bar.add(statusRight, BorderLayout.EAST);
         return bar;
-    }
-
-    private JPanel buildAdminPlaceholder() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(AppTheme.BACKGROUND);
-        p.setBorder(new EmptyBorder(40, 40, 40, 40));
-
-        JLabel lbl = new JLabel("System Administration  (Admin Only)", SwingConstants.CENTER);
-        lbl.setFont(AppTheme.FONT_TITLE);
-        lbl.setForeground(AppTheme.TEXT_SECONDARY);
-
-        JLabel sub = new JLabel("Manage staff accounts, view login history", SwingConstants.CENTER);
-        sub.setFont(AppTheme.FONT_BODY);
-        sub.setForeground(AppTheme.TEXT_SECONDARY);
-
-        JPanel inner = new JPanel(new GridLayout(2, 1, 0, 8));
-        inner.setOpaque(false);
-        inner.add(lbl);
-        inner.add(sub);
-        p.add(inner, BorderLayout.CENTER);
-        return p;
     }
 }

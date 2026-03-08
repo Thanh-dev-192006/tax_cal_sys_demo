@@ -17,19 +17,19 @@ import java.time.LocalDate;
 
 public class TaxCalculationPanel extends JPanel {
 
-    private final ClientService     clientService    = new ClientService();
-    private final TaxReturnService  taxReturnService = new TaxReturnService();
+    private final ClientService clientService = new ClientService();
+    private final TaxReturnService taxReturnService = new TaxReturnService();
 
     private Client currentClient = null;
 
     // UI components
-    private JTextField       txtSearchId;
-    private JLabel           lblSearchResult;
-    private JTextField       txtIncome;
-    private JSpinner         spnDependents;
+    private JTextField txtSearchId;
+    private JLabel lblSearchResult;
+    private JTextField txtIncome;
+    private JSpinner spnDependents;
     private JComboBox<String> cmbMarital;
-    private JEditorPane      txtReceipt;
-    private JButton          btnFileReturn;
+    private JEditorPane txtReceipt;
+    private JButton btnFileReturn;
 
     // Summary cards
     private JLabel lblCardIncome;
@@ -49,10 +49,12 @@ public class TaxCalculationPanel extends JPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         p.setBackground(AppTheme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(AppTheme.PRIMARY_BLUE, 1),
-                        "Step 1: Find Client"),
-                new EmptyBorder(4, 8, 4, 8)));
+                BorderFactory.createMatteBorder(0, 3, 0, 0, AppTheme.ACCENT_BLUE),
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder(
+                                BorderFactory.createLineBorder(AppTheme.ACCENT_BLUE, 1),
+                                "Step 1: Find Client"),
+                        new EmptyBorder(4, 8, 4, 8))));
 
         p.add(lbl("Client Tax ID (XXX-XX-XXXX):"));
         txtSearchId = new JTextField(16);
@@ -81,12 +83,12 @@ public class TaxCalculationPanel extends JPanel {
         cardsRow.setBackground(AppTheme.BACKGROUND);
         cardsRow.setBorder(new EmptyBorder(0, 0, 8, 0));
 
-        lblCardIncome = addCard(cardsRow, "Annual Income (VND)",
-                "0 VND", AppTheme.LIGHT_BLUE_BG,  AppTheme.PRIMARY_BLUE);
-        lblCardTax    = addCard(cardsRow, "Annual Tax (VND)",
-                "0 VND", AppTheme.LIGHT_RED_BG,   AppTheme.ALERT_RED);
-        lblCardNet    = addCard(cardsRow, "Net Annual Income (VND)",
-                "0 VND", AppTheme.LIGHT_GREEN_BG, AppTheme.ACCENT_GREEN);
+        lblCardIncome = buildCard(cardsRow, "Annual Income (VND)",
+                "0 VND", AppTheme.ACCENT_BLUE);
+        lblCardTax = buildCard(cardsRow, "Annual Tax (VND)",
+                "0 VND", AppTheme.ALERT_RED);
+        lblCardNet = buildCard(cardsRow, "Net Annual Income (VND)",
+                "0 VND", AppTheme.ACCENT_GREEN);
 
         JPanel top = new JPanel(new BorderLayout(10, 10));
         top.setBackground(AppTheme.BACKGROUND);
@@ -96,43 +98,63 @@ public class TaxCalculationPanel extends JPanel {
         JPanel inputPanel = new JPanel(new GridBagLayout());
         inputPanel.setBackground(AppTheme.CARD_BG);
         inputPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(AppTheme.PRIMARY_BLUE, 1),
-                        "Step 2: Adjust Parameters"),
-                new EmptyBorder(8, 12, 8, 12)));
+                BorderFactory.createMatteBorder(0, 3, 0, 0, AppTheme.PRIMARY_BLUE),
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder(
+                                BorderFactory.createLineBorder(AppTheme.PRIMARY_BLUE, 1),
+                                "Step 2: Adjust Parameters"),
+                        new EmptyBorder(8, 12, 8, 12))));
 
         GridBagConstraints lc = new GridBagConstraints();
-        lc.anchor = GridBagConstraints.WEST; lc.insets = new Insets(4, 4, 4, 8);
+        lc.anchor = GridBagConstraints.WEST;
+        lc.insets = new Insets(4, 4, 4, 8);
 
         GridBagConstraints fc = new GridBagConstraints();
-        fc.fill = GridBagConstraints.HORIZONTAL; fc.weightx = 1.0; fc.insets = new Insets(4, 0, 4, 16);
+        fc.fill = GridBagConstraints.HORIZONTAL;
+        fc.weightx = 1.0;
+        fc.insets = new Insets(4, 0, 4, 16);
 
-        lc.gridx = 0; lc.gridy = 0; inputPanel.add(lbl("Monthly Income (VND):"), lc);
-        fc.gridx = 1; fc.gridy = 0;
+        lc.gridx = 0;
+        lc.gridy = 0;
+        inputPanel.add(lbl("Monthly Income (VND):"), lc);
+        fc.gridx = 1;
+        fc.gridy = 0;
         txtIncome = new JTextField(14);
         txtIncome.setFont(AppTheme.FONT_BODY);
         inputPanel.add(txtIncome, fc);
 
-        lc.gridx = 2; lc.gridy = 0; inputPanel.add(lbl("Dependents:"), lc);
-        fc.gridx = 3; fc.gridy = 0; fc.weightx = 0.5;
+        lc.gridx = 2;
+        lc.gridy = 0;
+        inputPanel.add(lbl("Dependents:"), lc);
+        fc.gridx = 3;
+        fc.gridy = 0;
+        fc.weightx = 0.5;
         spnDependents = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnDependents.setFont(AppTheme.FONT_BODY);
         inputPanel.add(spnDependents, fc);
 
-        lc.gridx = 0; lc.gridy = 1; inputPanel.add(lbl("Marital Status:"), lc);
-        fc.gridx = 1; fc.gridy = 1; fc.weightx = 1.0;
-        cmbMarital = new JComboBox<>(new String[]{"SINGLE", "MARRIED", "DIVORCED", "WIDOWED"});
+        lc.gridx = 0;
+        lc.gridy = 1;
+        inputPanel.add(lbl("Marital Status:"), lc);
+        fc.gridx = 1;
+        fc.gridy = 1;
+        fc.weightx = 1.0;
+        cmbMarital = new JComboBox<>(new String[] { "SINGLE", "MARRIED", "DIVORCED", "WIDOWED" });
         cmbMarital.setFont(AppTheme.FONT_BODY);
         inputPanel.add(cmbMarital, fc);
 
-        lc.gridx = 2; lc.gridy = 1;
+        lc.gridx = 2;
+        lc.gridy = 1;
         JLabel infoDeduct = new JLabel("Personal deduction: 11M  |  Dependent: 4.4M / person");
         infoDeduct.setFont(AppTheme.FONT_SMALL);
         infoDeduct.setForeground(AppTheme.ACCENT_GREEN);
         inputPanel.add(infoDeduct, lc);
 
         GridBagConstraints bc = new GridBagConstraints();
-        bc.gridx = 4; bc.gridy = 0; bc.gridheight = 2; bc.insets = new Insets(4, 8, 4, 4);
+        bc.gridx = 4;
+        bc.gridy = 0;
+        bc.gridheight = 2;
+        bc.insets = new Insets(4, 8, 4, 4);
         JButton btnReset = styledBtn("Clear Form", AppTheme.TEXT_SECONDARY);
         btnReset.addActionListener(e -> clearForm());
         inputPanel.add(btnReset, bc);
@@ -144,8 +166,9 @@ public class TaxCalculationPanel extends JPanel {
         txtReceipt = new JEditorPane();
         txtReceipt.setContentType("text/html");
         txtReceipt.setEditable(false);
-        txtReceipt.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         txtReceipt.setBackground(Color.WHITE);
+        txtReceipt.setText("<html><body style='color:#757575; font-family:Segoe UI; padding:20px; text-align:center;'>"
+                + "📋 Enter a Client Tax ID above and click Load Data<br>to view detailed tax breakdown by income bracket.</body></html>");
 
         JScrollPane scroll = new JScrollPane(txtReceipt);
         scroll.setBorder(BorderFactory.createTitledBorder(
@@ -170,6 +193,7 @@ public class TaxCalculationPanel extends JPanel {
         btnFileReturn.setFocusPainted(false);
         btnFileReturn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnFileReturn.setEnabled(false);
+        btnFileReturn.setToolTipText("Complete tax calculation first");
         btnFileReturn.addActionListener(e -> fileTaxReturn());
 
         btnPanel.add(deadlineHint);
@@ -178,9 +202,20 @@ public class TaxCalculationPanel extends JPanel {
 
         // Live recalculation
         DocumentListener dl = new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e)  { calculate(); }
-            @Override public void removeUpdate(DocumentEvent e)  { calculate(); }
-            @Override public void changedUpdate(DocumentEvent e) { calculate(); }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                calculate();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                calculate();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                calculate();
+            }
         };
         txtIncome.getDocument().addDocumentListener(dl);
         spnDependents.addChangeListener(e -> calculate());
@@ -192,7 +227,8 @@ public class TaxCalculationPanel extends JPanel {
     // ── LOGIC ─────────────────────────────────────────────────────────
     private void performSearch() {
         String id = txtSearchId.getText().trim();
-        if (id.isEmpty()) return;
+        if (id.isEmpty())
+            return;
 
         currentClient = clientService.findClientById(id);
         if (currentClient != null) {
@@ -204,7 +240,8 @@ public class TaxCalculationPanel extends JPanel {
             spnDependents.setValue(currentClient.getDependents());
 
             String status = currentClient.getMaritalStatus();
-            if (status != null) cmbMarital.setSelectedItem(status.toUpperCase());
+            if (status != null)
+                cmbMarital.setSelectedItem(status.toUpperCase());
 
             calculate();
         } else {
@@ -222,19 +259,21 @@ public class TaxCalculationPanel extends JPanel {
             String text = txtIncome.getText().trim().replace(",", "");
             if (text.isEmpty()) {
                 resetCards();
-                txtReceipt.setText("<html><body style='color:#757575; font-family:Segoe UI; padding:20px;'>"
-                        + "Enter the monthly income above to view the tax statement.</body></html>");
+                txtReceipt.setText(
+                        "<html><body style='color:#757575; font-family:Segoe UI; padding:20px; text-align:center;'>"
+                                + "📋 Enter a Client Tax ID above and click Load Data<br>to view detailed tax breakdown by income bracket.</body></html>");
                 btnFileReturn.setEnabled(false);
+                btnFileReturn.setToolTipText("Complete tax calculation first");
                 return;
             }
 
-            double monthly     = Double.parseDouble(text);
-            int    dependents  = (int) spnDependents.getValue();
-            String marital     = (String) cmbMarital.getSelectedItem();
+            double monthly = Double.parseDouble(text);
+            int dependents = (int) spnDependents.getValue();
+            String marital = (String) cmbMarital.getSelectedItem();
 
-            double annualTax   = TaxCalculator.calculateTax(monthly, dependents);
-            double annualInc   = monthly * 12;
-            double net         = annualInc - annualTax;
+            double annualTax = TaxCalculator.calculateTax(monthly, dependents);
+            double annualInc = monthly * 12;
+            double net = annualInc - annualTax;
 
             lblCardIncome.setText(VndFormatter.formatShort(annualInc));
             lblCardTax.setText(VndFormatter.formatShort(annualTax));
@@ -242,13 +281,18 @@ public class TaxCalculationPanel extends JPanel {
 
             txtReceipt.setText(TaxCalculator.generateHTMLReceipt(monthly, dependents, marital));
             txtReceipt.setCaretPosition(0);
-            btnFileReturn.setEnabled(currentClient != null);
+
+            boolean canFile = currentClient != null;
+            btnFileReturn.setEnabled(canFile);
+            btnFileReturn.setToolTipText(canFile ? "Click to file tax return" : "Complete tax calculation first");
 
         } catch (NumberFormatException e) {
             resetCards();
-            txtReceipt.setText("<html><body style='color:#C62828; font-family:Segoe UI; padding:16px;'>"
-                    + "<b>Invalid input.</b> Please enter numbers only.</body></html>");
+            txtReceipt.setText(
+                    "<html><body style='color:#C62828; font-family:Segoe UI; padding:16px; text-align:center;'>"
+                            + "<b>Invalid input.</b> Please enter numbers only.</body></html>");
             btnFileReturn.setEnabled(false);
+            btnFileReturn.setToolTipText("Complete tax calculation first");
         }
     }
 
@@ -260,15 +304,16 @@ public class TaxCalculationPanel extends JPanel {
             return;
         }
         try {
-            double monthly     = Double.parseDouble(txtIncome.getText().trim().replace(",", ""));
-            int    dependents  = (int) spnDependents.getValue();
-            String marital     = (String) cmbMarital.getSelectedItem();
-            double annualTax   = TaxCalculator.calculateTax(monthly, dependents);
+            double monthly = Double.parseDouble(txtIncome.getText().trim().replace(",", ""));
+            int dependents = (int) spnDependents.getValue();
+            String marital = (String) cmbMarital.getSelectedItem();
+            double annualTax = TaxCalculator.calculateTax(monthly, dependents);
 
-            LocalDate today    = LocalDate.now();
+            LocalDate today = LocalDate.now();
             LocalDate deadline = LocalDate.of(today.getYear(), 4, 30);
-            String status      = today.isAfter(deadline)
-                    ? TaxReturn.STATUS_OVERDUE : TaxReturn.STATUS_FILED;
+            String status = today.isAfter(deadline)
+                    ? TaxReturn.STATUS_OVERDUE
+                    : TaxReturn.STATUS_FILED;
 
             taxReturnService.fileTaxReturn(
                     currentClient.getId(), monthly, dependents, marital);
@@ -296,14 +341,18 @@ public class TaxCalculationPanel extends JPanel {
     }
 
     private void clearForm() {
-        txtSearchId.setText(""); txtIncome.setText("");
-        spnDependents.setValue(0); cmbMarital.setSelectedIndex(0);
+        txtSearchId.setText("");
+        txtIncome.setText("");
+        spnDependents.setValue(0);
+        cmbMarital.setSelectedIndex(0);
         currentClient = null;
         lblSearchResult.setText("No client selected");
         lblSearchResult.setForeground(AppTheme.TEXT_SECONDARY);
         resetCards();
-        txtReceipt.setText("");
+        txtReceipt.setText("<html><body style='color:#757575; font-family:Segoe UI; padding:20px; text-align:center;'>"
+                + "📋 Enter a Client Tax ID above and click Load Data<br>to view detailed tax breakdown by income bracket.</body></html>");
         btnFileReturn.setEnabled(false);
+        btnFileReturn.setToolTipText("Complete tax calculation first");
     }
 
     private void resetCards() {
@@ -313,27 +362,12 @@ public class TaxCalculationPanel extends JPanel {
     }
 
     // ── HELPERS ──────────────────────────────────────────────────────
-    private JLabel addCard(JPanel parent, String title, String initVal,
-                           Color bg, Color textColor) {
-        JPanel card = new JPanel(new BorderLayout(0, 4));
-        card.setBackground(bg);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(textColor.darker(), 1),
-                new EmptyBorder(10, 12, 10, 12)));
-
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(AppTheme.FONT_CARD_LABEL);
-        lblTitle.setForeground(AppTheme.TEXT_SECONDARY);
-
-        JLabel lblVal = new JLabel(initVal);
-        lblVal.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblVal.setForeground(textColor);
-        lblVal.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        card.add(lblTitle, BorderLayout.NORTH);
-        card.add(lblVal, BorderLayout.CENTER);
-        parent.add(card);
-        return lblVal;
+    private JLabel buildCard(JPanel parent, String title, String initVal, Color c) {
+        JPanel p = AppTheme.createStatCard("", title, initVal, c);
+        p.setMinimumSize(new Dimension(80, 90));
+        p.setPreferredSize(new Dimension(p.getPreferredSize().width, 90));
+        parent.add(p);
+        return (JLabel) ((BorderLayout) p.getLayout()).getLayoutComponent(BorderLayout.CENTER);
     }
 
     private JLabel lbl(String text) {
