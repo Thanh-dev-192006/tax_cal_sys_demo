@@ -17,7 +17,7 @@ public class DatabaseUtil {
     private static final String URL = System.getProperty("db.url",
             "jdbc:mysql://localhost:3306/tax_return_system?useSSL=false&serverTimezone=UTC");
     private static final String USERNAME = System.getProperty("db.user", "root");
-    private static final String PASSWORD = System.getProperty("db.pass", "chongcuavy24/7");
+    private static final String PASSWORD = System.getProperty("db.pass", "Thanh@123");
     
     // Driver class (MySQL by default)
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
