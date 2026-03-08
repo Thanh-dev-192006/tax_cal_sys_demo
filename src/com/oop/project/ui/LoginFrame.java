@@ -49,7 +49,7 @@ public class LoginFrame extends JFrame {
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JLabel lblSub = new JLabel("Version 1.0 | DSAI1004 Project 6");
+        JLabel lblSub = new JLabel("Version 1.0 | AI66A Project 6");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblSub.setForeground(new Color(0xBB, 0xDE, 0xFB));
         lblSub.setHorizontalAlignment(SwingConstants.CENTER);
@@ -137,7 +137,7 @@ public class LoginFrame extends JFrame {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setBackground(AppTheme.BACKGROUND);
         footer.setBorder(new EmptyBorder(8, 0, 12, 0));
-        JLabel copy = new JLabel("© 2025 Tax Return Management System  |  DSAI1004 Project 6");
+        JLabel copy = new JLabel("© 2026 Tax Return Management System  |  AI66A Project 6");
         copy.setFont(AppTheme.FONT_SMALL);
         copy.setForeground(AppTheme.TEXT_SECONDARY);
         footer.add(copy);
