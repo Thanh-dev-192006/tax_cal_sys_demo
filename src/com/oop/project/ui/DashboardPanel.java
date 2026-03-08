@@ -102,15 +102,14 @@ public class DashboardPanel extends JPanel {
                 recentTable.getTableHeader().setBackground(AppTheme.BACKGROUND);
                 recentTable.setRowHeight(26);
                 recentTable.setGridColor(AppTheme.BORDER_COLOR);
-                recentTable.setSelectionBackground(AppTheme.LIGHT_BLUE_BG);
+                recentTable.setSelectionBackground(AppTheme.SELECTION_BG);
+                recentTable.setSelectionForeground(Color.WHITE);
 
                 recentTable.getColumnModel().getColumn(3)
-                                .setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
+                                .setCellRenderer((tbl, value, isSelected, hasFocus, row, column) -> {
                                         String status = value == null ? "" : value.toString();
-                                        JLabel badge = AppTheme.createStatusBadge(status);
-                                        if (isSelected)
-                                                badge.setBackground(badge.getBackground().darker());
-                                        return badge;
+                                        Color rowBg = row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA);
+                                        return AppTheme.createStatusLabel(status, isSelected, rowBg, AppTheme.SELECTION_BG);
                                 });
 
                 JScrollPane scroll = new JScrollPane(recentTable);

@@ -21,6 +21,7 @@ public final class AppTheme {
     public static final Color WARNING_AMBER   = new Color(0xFF, 0x98, 0x00);
     public static final Color ALERT_RED       = new Color(0xF4, 0x43, 0x36);
     public static final Color LIGHT_BLUE_BG   = new Color(0xE3, 0xF2, 0xFD);
+    public static final Color SELECTION_BG    = new Color(0x1E, 0x3A, 0x5F);
 
     // Existing colors kept to avoid breaking other files before refactoring
     public static final Color DARK_BLUE       = new Color(0x0D, 0x47, 0xA1);
@@ -81,21 +82,33 @@ public final class AppTheme {
     }
 
     public static JLabel createStatusBadge(String status) {
-        JLabel badge = new JLabel(status, SwingConstants.CENTER);
-        badge.setOpaque(true);
-        badge.setBorder(new javax.swing.border.EmptyBorder(3, 10, 3, 10));
-        badge.setFont(FONT_SMALL.deriveFont(Font.BOLD));
-        badge.setForeground(Color.WHITE);
+        return createStatusLabel(status, false, Color.WHITE, SELECTION_BG);
+    }
 
-        if ("Filed".equalsIgnoreCase(status)) {
-            badge.setBackground(new Color(0x4CAF50));
-        } else if ("Pending".equalsIgnoreCase(status)) {
-            badge.setBackground(new Color(0xFF9800));
-        } else if ("Overdue".equalsIgnoreCase(status)) {
-            badge.setBackground(new Color(0xF44336));
+    public static JLabel createStatusLabel(String status, boolean isSelected,
+                                            Color rowBg, Color selectionBg) {
+        JLabel lbl = new JLabel(status, SwingConstants.LEFT);
+        lbl.setOpaque(true);
+        lbl.setBorder(new javax.swing.border.EmptyBorder(2, 6, 2, 6));
+        lbl.setFont(FONT_BODY.deriveFont(Font.BOLD));
+
+        if (isSelected) {
+            lbl.setBackground(selectionBg);
+            lbl.setForeground(Color.WHITE);
         } else {
-            badge.setBackground(Color.GRAY);
+            lbl.setBackground(rowBg);
+            Color textColor;
+            if ("Filed".equalsIgnoreCase(status)) {
+                textColor = new Color(0x4CAF50);
+            } else if ("Pending".equalsIgnoreCase(status)) {
+                textColor = new Color(0xFF9800);
+            } else if ("Overdue".equalsIgnoreCase(status)) {
+                textColor = new Color(0xF44336);
+            } else {
+                textColor = TEXT_PRIMARY;
+            }
+            lbl.setForeground(textColor);
         }
-        return badge;
+        return lbl;
     }
 }

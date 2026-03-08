@@ -150,8 +150,12 @@ public class ReturnsPanel extends JPanel {
             @Override
             public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                if (!isCellSelected(row, column)) {
+                if (isRowSelected(row)) {
+                    c.setBackground(AppTheme.SELECTION_BG);
+                    c.setForeground(Color.WHITE);
+                } else {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
+                    c.setForeground(AppTheme.TEXT_PRIMARY);
                 }
                 return c;
             }
@@ -160,19 +164,18 @@ public class ReturnsPanel extends JPanel {
         table.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
         table.setRowHeight(26);
         table.setGridColor(AppTheme.BORDER_COLOR);
-        table.setSelectionBackground(AppTheme.LIGHT_BLUE_BG);
+        table.setSelectionBackground(AppTheme.SELECTION_BG);
+        table.setSelectionForeground(Color.WHITE);
 
         int[] widths = { 120, 160, 110, 170, 110, 120 };
         for (int i = 0; i < widths.length; i++)
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
 
-        // Colour-code the Status column (index 4)
+        // Colour-code the Status column (index 4) — text color only, no background box
         table.getColumnModel().getColumn(4).setCellRenderer((t, val, sel, foc, r, c) -> {
             String v = val == null ? "" : val.toString();
-            JLabel badge = AppTheme.createStatusBadge(v);
-            if (sel)
-                badge.setBackground(badge.getBackground().darker());
-            return badge;
+            Color rowBg = r % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA);
+            return AppTheme.createStatusLabel(v, sel, rowBg, AppTheme.SELECTION_BG);
         });
 
         sorter = new TableRowSorter<>(tableModel);

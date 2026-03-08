@@ -238,8 +238,12 @@ public class ClientPanel extends JPanel {
             @Override
             public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                if (!isCellSelected(row, column)) {
+                if (isRowSelected(row)) {
+                    c.setBackground(AppTheme.SELECTION_BG);
+                    c.setForeground(Color.WHITE);
+                } else {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
+                    c.setForeground(AppTheme.TEXT_PRIMARY);
                 }
                 return c;
             }
@@ -248,7 +252,8 @@ public class ClientPanel extends JPanel {
         table.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
         table.setRowHeight(26);
         table.setGridColor(AppTheme.BORDER_COLOR);
-        table.setSelectionBackground(AppTheme.LIGHT_BLUE_BG);
+        table.setSelectionBackground(AppTheme.SELECTION_BG);
+        table.setSelectionForeground(Color.WHITE);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 
         int[] widths = { 110, 170, 140, 85, 105, 170, 110, 90 };
