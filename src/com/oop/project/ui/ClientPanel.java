@@ -20,13 +20,13 @@ public class ClientPanel extends JPanel {
     private final ClientService clientService = new ClientService();
 
     // Form fields
-    private JTextField   fldId, fldName, fldIncome, fldPhone, fldEmail, fldCity;
+    private JTextField fldId, fldName, fldIncome, fldPhone, fldEmail, fldCity;
     private JComboBox<String> cmbMarital;
-    private JSpinner     spnDependents;
+    private JSpinner spnDependents;
 
     // Table
-    private JTable                      table;
-    private DefaultTableModel           tableModel;
+    private JTable table;
+    private DefaultTableModel tableModel;
     private TableRowSorter<DefaultTableModel> sorter;
 
     // Search
@@ -40,7 +40,7 @@ public class ClientPanel extends JPanel {
     private void initializeUI() {
         setLayout(new BorderLayout());
         setBackground(AppTheme.BACKGROUND);
-        add(buildFormPanel(),  BorderLayout.NORTH);
+        add(buildFormPanel(), BorderLayout.NORTH);
         add(buildTablePanel(), BorderLayout.CENTER);
     }
 
@@ -65,65 +65,108 @@ public class ClientPanel extends JPanel {
         lc.insets = new Insets(4, 4, 4, 6);
 
         GridBagConstraints fc = new GridBagConstraints();
-        fc.fill    = GridBagConstraints.HORIZONTAL;
+        fc.fill = GridBagConstraints.HORIZONTAL;
         fc.weightx = 1.0;
-        fc.insets  = new Insets(4, 0, 4, 12);
+        fc.insets = new Insets(4, 0, 4, 12);
 
         // Row 0 — Tax ID | Name
-        lc.gridx = 0; lc.gridy = 0; form.add(lbl("Tax ID (XXX-XX-XXXX):"), lc);
-        fc.gridx = 1; fc.gridy = 0;
-        fldId = new JTextField(14); form.add(fldId, fc);
+        lc.gridx = 0;
+        lc.gridy = 0;
+        form.add(lbl("Tax ID (XXX-XX-XXXX):"), lc);
+        fc.gridx = 1;
+        fc.gridy = 0;
+        fldId = new JTextField(14);
+        fldId.putClientProperty("JTextField.placeholderText", "e.g. 123-45-6789");
+        form.add(fldId, fc);
 
-        lc.gridx = 2; lc.gridy = 0; form.add(lbl("Full Name:"), lc);
-        fc.gridx = 3; fc.gridy = 0;
-        fldName = new JTextField(14); form.add(fldName, fc);
+        lc.gridx = 2;
+        lc.gridy = 0;
+        form.add(lbl("Full Name:"), lc);
+        fc.gridx = 3;
+        fc.gridy = 0;
+        fldName = new JTextField(14);
+        fldName.putClientProperty("JTextField.placeholderText", "Full name");
+        form.add(fldName, fc);
 
         // Row 1 — Income | Marital Status
-        lc.gridx = 0; lc.gridy = 1; form.add(lbl("Monthly Income (VND):"), lc);
-        fc.gridx = 1; fc.gridy = 1;
-        fldIncome = new JTextField(14); form.add(fldIncome, fc);
+        lc.gridx = 0;
+        lc.gridy = 1;
+        form.add(lbl("Monthly Income (VND):"), lc);
+        fc.gridx = 1;
+        fc.gridy = 1;
+        JPanel incomePnl = new JPanel(new BorderLayout());
+        incomePnl.setOpaque(false);
+        fldIncome = new JTextField(14);
+        fldIncome.putClientProperty("JTextField.placeholderText", "e.g. 15000000");
+        incomePnl.add(fldIncome, BorderLayout.CENTER);
+        JLabel hintInc = new JLabel("* Enter amount in VND, no commas  (e.g. 15000000 = 15 triệu)");
+        hintInc.setFont(AppTheme.FONT_SMALL);
+        hintInc.setForeground(AppTheme.WARNING_AMBER);
+        incomePnl.add(hintInc, BorderLayout.SOUTH);
+        form.add(incomePnl, fc);
 
-        lc.gridx = 2; lc.gridy = 1; form.add(lbl("Marital Status:"), lc);
-        fc.gridx = 3; fc.gridy = 1;
-        cmbMarital = new JComboBox<>(new String[]{"SINGLE", "MARRIED", "DIVORCED", "WIDOWED"});
+        lc.gridx = 2;
+        lc.gridy = 1;
+        form.add(lbl("Marital Status:"), lc);
+        fc.gridx = 3;
+        fc.gridy = 1;
+        cmbMarital = new JComboBox<>(new String[] { "SINGLE", "MARRIED", "DIVORCED", "WIDOWED" });
         cmbMarital.setFont(AppTheme.FONT_BODY);
         form.add(cmbMarital, fc);
 
         // Row 2 — Dependents | Phone
-        lc.gridx = 0; lc.gridy = 2; form.add(lbl("Dependents:"), lc);
-        fc.gridx = 1; fc.gridy = 2;
+        lc.gridx = 0;
+        lc.gridy = 2;
+        form.add(lbl("Dependents:"), lc);
+        fc.gridx = 1;
+        fc.gridy = 2;
         spnDependents = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnDependents.setFont(AppTheme.FONT_BODY);
         form.add(spnDependents, fc);
 
-        lc.gridx = 2; lc.gridy = 2; form.add(lbl("Phone Number:"), lc);
-        fc.gridx = 3; fc.gridy = 2;
-        fldPhone = new JTextField(14); form.add(fldPhone, fc);
+        lc.gridx = 2;
+        lc.gridy = 2;
+        form.add(lbl("Phone Number:"), lc);
+        fc.gridx = 3;
+        fc.gridy = 2;
+        fldPhone = new JTextField(14);
+        fldPhone.putClientProperty("JTextField.placeholderText", "e.g. 0912345678");
+        form.add(fldPhone, fc);
 
         // Row 3 — Email | City
-        lc.gridx = 0; lc.gridy = 3; form.add(lbl("Email:"), lc);
-        fc.gridx = 1; fc.gridy = 3;
-        fldEmail = new JTextField(14); form.add(fldEmail, fc);
+        lc.gridx = 0;
+        lc.gridy = 3;
+        form.add(lbl("Email:"), lc);
+        fc.gridx = 1;
+        fc.gridy = 3;
+        fldEmail = new JTextField(14);
+        fldEmail.putClientProperty("JTextField.placeholderText", "name@email.com");
+        form.add(fldEmail, fc);
 
-        lc.gridx = 2; lc.gridy = 3; form.add(lbl("City / Province:"), lc);
-        fc.gridx = 3; fc.gridy = 3;
-        fldCity = new JTextField(14); form.add(fldCity, fc);
+        lc.gridx = 2;
+        lc.gridy = 3;
+        form.add(lbl("City / Province:"), lc);
+        fc.gridx = 3;
+        fc.gridy = 3;
+        fldCity = new JTextField(14);
+        fldCity.putClientProperty("JTextField.placeholderText", "Ha Noi, Ho Chi Minh...");
+        form.add(fldCity, fc);
 
         // Row 4 — Buttons
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         btnRow.setOpaque(false);
 
-        JButton btnAdd    = styledBtn("+ Add New",     AppTheme.ACCENT_GREEN);
-        JButton btnUpdate = styledBtn("Save Update",   AppTheme.PRIMARY_BLUE);
-        JButton btnDelete = styledBtn("Delete",        AppTheme.ALERT_RED);
-        JButton btnClear  = styledBtn("Clear Form",    AppTheme.TEXT_SECONDARY);
-        JButton btnCsv    = styledBtn("Export CSV",    AppTheme.WARNING_AMBER);
+        JButton btnAdd = styledBtn("+ Add New", AppTheme.ACCENT_GREEN);
+        JButton btnUpdate = styledBtn("Save Update", AppTheme.PRIMARY_BLUE);
+        JButton btnDelete = styledBtn("Delete", AppTheme.ALERT_RED);
+        JButton btnClear = styledBtn("Clear Form", AppTheme.TEXT_SECONDARY);
+        JButton btnCsv = styledBtn("Export CSV", AppTheme.WARNING_AMBER);
 
-        btnAdd.addActionListener(e    -> addClient());
+        btnAdd.addActionListener(e -> addClient());
         btnUpdate.addActionListener(e -> updateClient());
         btnDelete.addActionListener(e -> deleteClient());
-        btnClear.addActionListener(e  -> clearForm());
-        btnCsv.addActionListener(e    -> CsvExporter.exportClients(clientService.getAllClients(), this));
+        btnClear.addActionListener(e -> clearForm());
+        btnCsv.addActionListener(e -> CsvExporter.exportClients(clientService.getAllClients(), this));
 
         btnRow.add(btnAdd);
         btnRow.add(btnUpdate);
@@ -133,12 +176,15 @@ public class ClientPanel extends JPanel {
         btnRow.add(btnCsv);
 
         GridBagConstraints bc = new GridBagConstraints();
-        bc.gridx = 0; bc.gridy = 4; bc.gridwidth = 4;
-        bc.insets  = new Insets(8, 0, 4, 0);
-        bc.anchor  = GridBagConstraints.WEST;
+        bc.gridx = 0;
+        bc.gridy = 4;
+        bc.gridwidth = 4;
+        bc.insets = new Insets(8, 0, 4, 0);
+        bc.anchor = GridBagConstraints.WEST;
         form.add(btnRow, bc);
 
         wrapper.add(form, BorderLayout.CENTER);
+        wrapper.add(new JSeparator(), BorderLayout.SOUTH);
         return wrapper;
     }
 
@@ -155,9 +201,20 @@ public class ClientPanel extends JPanel {
         fldSearch = new JTextField(24);
         fldSearch.setFont(AppTheme.FONT_BODY);
         fldSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            @Override public void insertUpdate(javax.swing.event.DocumentEvent e)  { applyFilter(); }
-            @Override public void removeUpdate(javax.swing.event.DocumentEvent e)  { applyFilter(); }
-            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { applyFilter(); }
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
         });
         searchBar.add(fldSearch);
 
@@ -168,21 +225,38 @@ public class ClientPanel extends JPanel {
 
         // Table
         String[] cols = {
-            "Tax ID", "Full Name", "Income (VND/month)",
-            "Dependents", "Marital Status", "Email", "Phone", "City"
+                "Tax ID", "Full Name", "Income (VND/month)",
+                "Dependents", "Marital Status", "Email", "Phone", "City"
         };
         tableModel = new DefaultTableModel(cols, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
-        table = new JTable(tableModel);
+        table = new JTable(tableModel) {
+            @Override
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (isRowSelected(row)) {
+                    c.setBackground(AppTheme.SELECTION_BG);
+                    c.setForeground(Color.WHITE);
+                } else {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
+                    c.setForeground(AppTheme.TEXT_PRIMARY);
+                }
+                return c;
+            }
+        };
         table.setFont(AppTheme.FONT_BODY);
-        table.getTableHeader().setFont(AppTheme.FONT_BODY);
+        table.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
         table.setRowHeight(26);
         table.setGridColor(AppTheme.BORDER_COLOR);
-        table.setSelectionBackground(AppTheme.LIGHT_BLUE_BG);
+        table.setSelectionBackground(AppTheme.SELECTION_BG);
+        table.setSelectionForeground(Color.WHITE);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 
-        int[] widths = {120, 160, 150, 80, 110, 180, 110, 90};
+        int[] widths = { 110, 170, 140, 85, 105, 170, 110, 90 };
         for (int i = 0; i < widths.length; i++)
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
 
@@ -199,7 +273,7 @@ public class ClientPanel extends JPanel {
         scroll.setBorder(BorderFactory.createLineBorder(AppTheme.BORDER_COLOR));
 
         panel.add(searchBar, BorderLayout.NORTH);
-        panel.add(scroll,    BorderLayout.CENTER);
+        panel.add(scroll, BorderLayout.CENTER);
         return panel;
     }
 
@@ -250,7 +324,7 @@ public class ClientPanel extends JPanel {
     private void loadClients() {
         tableModel.setRowCount(0);
         for (Client c : clientService.getAllClients()) {
-            tableModel.addRow(new Object[]{
+            tableModel.addRow(new Object[] {
                     c.getId(),
                     c.getName(),
                     VndFormatter.formatNumberOnly(c.getIncome()),
@@ -265,14 +339,16 @@ public class ClientPanel extends JPanel {
 
     private void populateFormFromRow(int modelRow) {
         List<Client> clients = clientService.getAllClients();
-        if (modelRow < 0 || modelRow >= clients.size()) return;
+        if (modelRow < 0 || modelRow >= clients.size())
+            return;
         Client c = clients.get(modelRow);
         fldId.setText(c.getId());
         fldName.setText(c.getName());
         fldIncome.setText(String.format("%.0f", c.getIncome()));
         spnDependents.setValue(c.getDependents());
         cmbMarital.setSelectedItem(c.getMaritalStatus() != null
-                ? c.getMaritalStatus().toUpperCase() : "SINGLE");
+                ? c.getMaritalStatus().toUpperCase()
+                : "SINGLE");
         fldPhone.setText(c.getPhoneNumber());
         fldEmail.setText(c.getEmail());
         fldCity.setText(c.getCity());
@@ -280,7 +356,10 @@ public class ClientPanel extends JPanel {
 
     private void applyFilter() {
         String text = fldSearch.getText().trim();
-        if (text.isEmpty()) { sorter.setRowFilter(null); return; }
+        if (text.isEmpty()) {
+            sorter.setRowFilter(null);
+            return;
+        }
         try {
             sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text, 0, 1, 4, 5, 7));
         } catch (java.util.regex.PatternSyntaxException ignored) {
@@ -289,10 +368,12 @@ public class ClientPanel extends JPanel {
     }
 
     private Client buildClientFromForm() throws InvalidDataException {
-        String id   = fldId.getText().trim();
+        String id = fldId.getText().trim();
         String name = fldName.getText().trim();
-        if (id.isEmpty())   throw new InvalidDataException("Tax ID is required.");
-        if (name.isEmpty()) throw new InvalidDataException("Full name is required.");
+        if (id.isEmpty())
+            throw new InvalidDataException("Tax ID is required.");
+        if (name.isEmpty())
+            throw new InvalidDataException("Full name is required.");
 
         double income;
         try {
@@ -300,7 +381,8 @@ public class ClientPanel extends JPanel {
         } catch (NumberFormatException e) {
             throw new InvalidDataException("Invalid income value. Please enter a number.");
         }
-        if (income < 0) throw new InvalidDataException("Income cannot be negative.");
+        if (income < 0)
+            throw new InvalidDataException("Income cannot be negative.");
 
         return new Client(id, name, income,
                 (int) spnDependents.getValue(),
@@ -311,8 +393,12 @@ public class ClientPanel extends JPanel {
     }
 
     private void clearForm() {
-        fldId.setText(""); fldName.setText(""); fldIncome.setText("");
-        fldPhone.setText(""); fldEmail.setText(""); fldCity.setText("");
+        fldId.setText("");
+        fldName.setText("");
+        fldIncome.setText("");
+        fldPhone.setText("");
+        fldEmail.setText("");
+        fldCity.setText("");
         spnDependents.setValue(0);
         cmbMarital.setSelectedIndex(0);
         table.clearSelection();

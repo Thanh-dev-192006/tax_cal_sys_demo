@@ -134,20 +134,51 @@ public class UserRepository {
      */
     public void deleteUser(String username) {
         String sql = "DELETE FROM Users WHERE username = ?";
-        
+
         try (Connection conn = DatabaseUtil.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+
             stmt.setString(1, username);
             int rows = stmt.executeUpdate();
-            
+
             if (rows > 0) {
                 System.out.println("Deleted user: " + username);
             }
-            
+
         } catch (SQLException e) {
             System.err.println("Error deleting user: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update user's full name and role
+     */
+    public void updateUser(String username, String fullName, String role) {
+        String sql = "UPDATE Users SET full_name = ?, role = ? WHERE username = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, fullName);
+            stmt.setString(2, role);
+            stmt.setString(3, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error updating user: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user's password
+     */
+    public void updatePassword(String username, String newPassword) {
+        String sql = "UPDATE Users SET password = ? WHERE username = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newPassword);
+            stmt.setString(2, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error updating password: " + e.getMessage());
         }
     }
 }
