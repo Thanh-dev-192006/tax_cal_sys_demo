@@ -9,170 +9,188 @@ import com.oop.project.util.VndFormatter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class DashboardPanel extends JPanel {
 
-        private final ClientService clientService = new ClientService();
-        private final TaxReturnService taxReturnService = new TaxReturnService();
+    private final ClientService    clientService    = new ClientService();
+    private final TaxReturnService taxReturnService = new TaxReturnService();
 
-        // 6 stat-card value labels
-        private JLabel valTotalClients;
-        private JLabel valFiled;
-        private JLabel valPending;
-        private JLabel valOverdue;
-        private JLabel valTotalTax;
-        private JLabel valAvgTax;
+    // Stat card value labels
+    private JLabel valTotalClients;
+    private JLabel valFiled;
+    private JLabel valPending;
+    private JLabel valOverdue;
+    private JLabel valTotalTax;
+    private JLabel valAvgTax;
 
-        // Label for count
-        private JLabel lblShowingCount;
+    private DefaultTableModel recentModel;
+    private JLabel lblShowingCount;
 
-        // Recent-returns table (populated in refresh())
-        private DefaultTableModel recentModel;
+    public DashboardPanel() {
+        initializeUI();
+        refresh();
+    }
 
-        public DashboardPanel() {
-                initializeUI();
-                refresh();
-        }
+    private void initializeUI() {
+        setLayout(new BorderLayout());
+        setBackground(AppTheme.WARM_BG);
 
-        private void initializeUI() {
-                setLayout(new BorderLayout());
-                setBackground(AppTheme.BACKGROUND);
+        add(buildPageHeader(), BorderLayout.NORTH);
+        add(buildBody(),       BorderLayout.CENTER);
+    }
 
-                // ── HEADER ──────────────────────────────────────────────────
-                JPanel header = new JPanel(new BorderLayout());
-                header.setBackground(AppTheme.BACKGROUND);
-                header.setBorder(new EmptyBorder(16, 20, 8, 20));
+    // ── PAGE HEADER ──────────────────────────────────────────────────
+    private JPanel buildPageHeader() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(AppTheme.WARM_BG);
+        p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
 
-                JLabel lblTitle = new JLabel("System Overview");
-                lblTitle.setFont(AppTheme.FONT_TITLE);
-                lblTitle.setForeground(AppTheme.PRIMARY_BLUE);
+        JLabel title = new JLabel("System Overview");
+        title.setFont(AppTheme.FONT_H1);
+        title.setForeground(AppTheme.TEXT_PRIMARY);
 
-                JButton btnRefresh = new JButton("Refresh");
-                btnRefresh.setFont(AppTheme.FONT_BUTTON);
-                btnRefresh.setBackground(AppTheme.PRIMARY_BLUE);
-                btnRefresh.setForeground(Color.WHITE);
-                btnRefresh.setFocusPainted(false);
-                btnRefresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnRefresh.setBorder(new EmptyBorder(6, 16, 6, 16));
-                btnRefresh.addActionListener(e -> refresh());
+        JButton btnRefresh = AppTheme.primaryBtn("Refresh");
+        btnRefresh.addActionListener(e -> refresh());
 
-                header.add(lblTitle, BorderLayout.WEST);
-                header.add(btnRefresh, BorderLayout.EAST);
+        p.add(title,      BorderLayout.WEST);
+        p.add(btnRefresh, BorderLayout.EAST);
+        return p;
+    }
 
-                // ── 6 STAT CARDS (2 rows × 3 cols) ────────────────────────
-                JPanel cardsPanel = new JPanel(new GridLayout(2, 3, 14, 14));
-                cardsPanel.setBackground(AppTheme.BACKGROUND);
-                cardsPanel.setBorder(new EmptyBorder(0, 20, 16, 20));
+    // ── BODY ─────────────────────────────────────────────────────────
+    private JPanel buildBody() {
+        JPanel body = new JPanel(new BorderLayout(0, 0));
+        body.setBackground(AppTheme.WARM_BG);
 
-                valTotalClients = buildCard(cardsPanel, "👥", "Total Clients",
-                                "0", AppTheme.PRIMARY_BLUE);
-                valFiled = buildCard(cardsPanel, "📄", "Filed Returns",
-                                "0", AppTheme.ACCENT_GREEN);
-                valPending = buildCard(cardsPanel, "⏳", "Pending Returns",
-                                "0", AppTheme.WARNING_AMBER);
-                valOverdue = buildCard(cardsPanel, "⚠️", "Overdue",
-                                "0", AppTheme.ALERT_RED);
-                valTotalTax = buildCard(cardsPanel, "💰", "Total Tax Collected (VND)",
-                                "0 VND", AppTheme.ACCENT_BLUE);
-                valAvgTax = buildCard(cardsPanel, "📊", "Avg Tax / Client (VND)",
-                                "0 VND", new Color(0x9C, 0x27, 0xB0));
+        body.add(buildStatsGrid(),    BorderLayout.NORTH);
+        body.add(buildRecentSection(), BorderLayout.CENTER);
+        return body;
+    }
 
-                // ── RECENT RETURNS TABLE ────────────────────────────────────
-                JPanel tableSection = new JPanel(new BorderLayout(0, 6));
-                tableSection.setBackground(AppTheme.BACKGROUND);
-                tableSection.setBorder(new EmptyBorder(0, 20, 20, 20));
+    // ── 6 STAT CARDS ─────────────────────────────────────────────────
+    private JPanel buildStatsGrid() {
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AppTheme.WARM_BG);
+        wrapper.setBorder(new EmptyBorder(0, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
 
-                JLabel lblRecent = new JLabel("Recent Tax Returns");
-                lblRecent.setFont(AppTheme.FONT_SUBTITLE);
-                lblRecent.setForeground(AppTheme.PRIMARY_BLUE);
+        JPanel grid = new JPanel(new GridLayout(2, 3, 12, 12));
+        grid.setBackground(AppTheme.WARM_BG);
 
-                String[] cols = { "Client ID", "Filing Date", "Tax Liability (VND)", "Status", "Marital Status" };
-                recentModel = new DefaultTableModel(cols, 0) {
-                        @Override
-                        public boolean isCellEditable(int r, int c) {
-                                return false;
-                        }
-                };
-                JTable recentTable = new JTable(recentModel);
-                recentTable.setFont(AppTheme.FONT_BODY);
-                recentTable.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
-                recentTable.getTableHeader().setBackground(AppTheme.BACKGROUND);
-                recentTable.setRowHeight(26);
-                recentTable.setGridColor(AppTheme.BORDER_COLOR);
-                recentTable.setSelectionBackground(AppTheme.SELECTION_BG);
-                recentTable.setSelectionForeground(Color.WHITE);
+        valTotalClients = buildCard(grid, "\u25A0", "Total Clients",            "0",     AppTheme.PRIMARY_BLUE);
+        valFiled        = buildCard(grid, "\u25A0", "Filed Returns",            "0",     AppTheme.ACCENT_GREEN);
+        valPending      = buildCard(grid, "\u25A0", "Pending Returns",          "0",     AppTheme.WARNING_AMBER);
+        valOverdue      = buildCard(grid, "\u25A0", "Overdue",                  "0",     AppTheme.ALERT_RED);
+        valTotalTax     = buildCard(grid, "\u25A0", "Total Tax Collected (VND)","0 VND", AppTheme.ACCENT_BLUE);
+        valAvgTax       = buildCard(grid, "\u25A0", "Avg Tax / Client (VND)",   "0 VND", new Color(0x6A, 0x1B, 0x9A));
 
-                recentTable.getColumnModel().getColumn(3)
-                                .setCellRenderer((tbl, value, isSelected, hasFocus, row, column) -> {
-                                        String status = value == null ? "" : value.toString();
-                                        Color rowBg = row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA);
-                                        return AppTheme.createStatusLabel(status, isSelected, rowBg, AppTheme.SELECTION_BG);
-                                });
+        wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
 
-                JScrollPane scroll = new JScrollPane(recentTable);
-                scroll.setBorder(BorderFactory.createLineBorder(AppTheme.BORDER_COLOR));
-                scroll.setPreferredSize(new Dimension(0, 180));
+    private JLabel buildCard(JPanel parent, String icon, String title, String val, Color accent) {
+        JPanel card = AppTheme.createStatCard(icon, title, val, accent);
+        parent.add(card);
+        return (JLabel) ((BorderLayout) card.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+    }
 
-                tableSection.add(lblRecent, BorderLayout.NORTH);
-                tableSection.add(scroll, BorderLayout.CENTER);
+    // ── RECENT RETURNS TABLE ──────────────────────────────────────────
+    private JPanel buildRecentSection() {
+        JPanel section = new JPanel(new BorderLayout(0, 8));
+        section.setBackground(AppTheme.WARM_BG);
+        section.setBorder(new EmptyBorder(0, AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_LG));
 
-                lblShowingCount = new JLabel("Showing 0 recent returns");
-                lblShowingCount.setFont(AppTheme.FONT_SMALL);
-                lblShowingCount.setForeground(AppTheme.TEXT_SECONDARY);
-                lblShowingCount.setBorder(new EmptyBorder(4, 4, 0, 0));
-                tableSection.add(lblShowingCount, BorderLayout.SOUTH);
+        // Section heading
+        JPanel heading = new JPanel(new BorderLayout());
+        heading.setOpaque(false);
+        heading.setBorder(new EmptyBorder(0, 0, AppTheme.PAD_SM, 0));
 
-                // ── ASSEMBLE ────────────────────────────────────────────────
-                JPanel center = new JPanel(new BorderLayout());
-                center.setBackground(AppTheme.BACKGROUND);
-                center.add(cardsPanel, BorderLayout.NORTH);
-                center.add(tableSection, BorderLayout.CENTER);
+        JLabel lblTitle = new JLabel("Recent Tax Returns");
+        lblTitle.setFont(AppTheme.FONT_H2);
+        lblTitle.setForeground(AppTheme.TEXT_PRIMARY);
 
-                add(header, BorderLayout.NORTH);
-                add(center, BorderLayout.CENTER);
-        }
+        lblShowingCount = new JLabel("Showing 0 recent records");
+        lblShowingCount.setFont(AppTheme.FONT_CAPTION);
+        lblShowingCount.setForeground(AppTheme.TEXT_SECONDARY);
 
-        private JLabel buildCard(JPanel parent, String icon, String title, String val, Color c) {
-                JPanel p = AppTheme.createStatCard(icon, title, val, c);
-                parent.add(p);
-                return (JLabel) ((BorderLayout) p.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-        }
+        heading.add(lblTitle,       BorderLayout.WEST);
+        heading.add(lblShowingCount, BorderLayout.EAST);
 
-        public void refresh() {
-                List<Client> clients = clientService.getAllClients();
-                List<TaxReturn> returns = taxReturnService.getAllTaxReturns();
+        // Table
+        String[] cols = {"Client ID", "Filing Date", "Tax Liability (VND)", "Status", "Marital Status"};
+        recentModel = new DefaultTableModel(cols, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
 
-                int total = clients.size();
-                long filed = taxReturnService.getFiledCount(returns);
-                long overdue = taxReturnService.getOverdueCount(returns);
-                long pending = taxReturnService.getPendingCount(total, returns);
-                double totalTax = taxReturnService.getTotalTaxCollected(returns);
-                double avgTax = taxReturnService.getAverageTaxLiability(returns);
-
-                valTotalClients.setText(String.valueOf(total));
-                valFiled.setText(String.valueOf(filed));
-                valPending.setText(String.valueOf(pending));
-                valOverdue.setText(String.valueOf(overdue));
-                valTotalTax.setText(VndFormatter.formatShort(totalTax));
-                valAvgTax.setText(VndFormatter.formatShort(avgTax));
-
-                // Populate recent returns (up to 10, latest first)
-                recentModel.setRowCount(0);
-                int limit = Math.min(returns.size(), 10);
-                for (int i = returns.size() - 1; i >= returns.size() - limit; i--) {
-                        TaxReturn tr = returns.get(i);
-                        recentModel.addRow(new Object[] {
-                                        tr.getClientId(),
-                                        tr.getFilingDate(),
-                                        VndFormatter.format(tr.getTaxLiability()),
-                                        tr.getStatus(),
-                                        tr.getMaritalStatus()
-                        });
+        JTable table = new JTable(recentModel) {
+            @Override
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int col) {
+                Component c = super.prepareRenderer(renderer, row, col);
+                if (col != 3) {
+                    if (isRowSelected(row)) {
+                        c.setBackground(AppTheme.TABLE_SELECTION_BG);
+                        c.setForeground(AppTheme.TABLE_SELECTION_FG);
+                    } else {
+                        c.setBackground(row % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE);
+                        c.setForeground(AppTheme.TEXT_PRIMARY);
+                    }
                 }
+                return c;
+            }
+        };
+        AppTheme.styleTable(table);
 
-                lblShowingCount.setText("Showing " + limit + " recent returns");
+        // Status badge renderer — colors ONLY the status cell
+        table.getColumnModel().getColumn(3).setCellRenderer(
+                (tbl, value, isSelected, hasFocus, row, column) -> {
+                    String status = value == null ? "" : value.toString();
+                    Color rowBg = row % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE;
+                    return AppTheme.createStatusLabel(status, isSelected, rowBg, AppTheme.TABLE_SELECTION_BG);
+                });
+
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setBorder(new MatteBorder(1, 1, 1, 1, AppTheme.WARM_BORDER));
+        scroll.setBackground(AppTheme.WARM_CARD);
+
+        section.add(heading, BorderLayout.NORTH);
+        section.add(scroll,  BorderLayout.CENTER);
+        return section;
+    }
+
+    // ── REFRESH ──────────────────────────────────────────────────────
+    public void refresh() {
+        List<Client>    clients = clientService.getAllClients();
+        List<TaxReturn> returns = taxReturnService.getAllTaxReturns();
+
+        int    total   = clients.size();
+        long   filed   = taxReturnService.getFiledCount(returns);
+        long   overdue = taxReturnService.getOverdueCount(returns);
+        long   pending = taxReturnService.getPendingCount(total, returns);
+        double totalTax = taxReturnService.getTotalTaxCollected(returns);
+        double avgTax   = taxReturnService.getAverageTaxLiability(returns);
+
+        valTotalClients.setText(String.valueOf(total));
+        valFiled.setText(String.valueOf(filed));
+        valPending.setText(String.valueOf(pending));
+        valOverdue.setText(String.valueOf(overdue));
+        valTotalTax.setText(VndFormatter.formatShort(totalTax));
+        valAvgTax.setText(VndFormatter.formatShort(avgTax));
+
+        recentModel.setRowCount(0);
+        int limit = Math.min(returns.size(), 10);
+        for (int i = returns.size() - 1; i >= returns.size() - limit; i--) {
+            TaxReturn tr = returns.get(i);
+            recentModel.addRow(new Object[]{
+                    tr.getClientId(),
+                    tr.getFilingDate(),
+                    VndFormatter.format(tr.getTaxLiability()),
+                    tr.getStatus(),
+                    tr.getMaritalStatus()
+            });
         }
+        lblShowingCount.setText("Showing " + limit + " recent records");
+    }
 }
