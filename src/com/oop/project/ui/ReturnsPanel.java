@@ -10,6 +10,7 @@ import com.oop.project.util.VndFormatter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class ReturnsPanel extends JPanel {
 
-    private final ClientService clientService = new ClientService();
+    private final ClientService    clientService    = new ClientService();
     private final TaxReturnService taxReturnService = new TaxReturnService();
 
     private JTable table;
@@ -29,8 +30,7 @@ public class ReturnsPanel extends JPanel {
     private JComboBox<String> cmbStatusFilter;
 
     // Mini stats
-    private JLabel lblStatTotal, lblStatFiled, lblStatPending, lblStatOverdue;
-    private JLabel lblRowCount;
+    private JLabel lblStatTotal, lblStatFiled, lblStatPending, lblStatOverdue, lblRowCount;
 
     public ReturnsPanel() {
         initializeUI();
@@ -38,160 +38,159 @@ public class ReturnsPanel extends JPanel {
 
     private void initializeUI() {
         setLayout(new BorderLayout());
-        setBackground(AppTheme.BACKGROUND);
-        add(buildTopBar(), BorderLayout.NORTH);
-        add(buildTablePanel(), BorderLayout.CENTER);
+        setBackground(AppTheme.WARM_BG);
+        add(buildPageHeader(), BorderLayout.NORTH);
+        add(buildBody(),       BorderLayout.CENTER);
     }
 
-    // ── TOP BAR ──────────────────────────────────────────────────────
-    private JPanel buildTopBar() {
-        JPanel bar = new JPanel(new BorderLayout(12, 0));
-        bar.setBackground(AppTheme.BACKGROUND);
-        bar.setBorder(new EmptyBorder(10, 12, 6, 12));
+    // ── PAGE HEADER ──────────────────────────────────────────────────
+    private JPanel buildPageHeader() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(AppTheme.WARM_BG);
+        p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_SM, AppTheme.PAD_LG));
+        JLabel title = new JLabel("Tax Returns");
+        title.setFont(AppTheme.FONT_H1);
+        title.setForeground(AppTheme.TEXT_PRIMARY);
+        p.add(title, BorderLayout.WEST);
+        return p;
+    }
 
-        // Search + status filter
-        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        left.setBackground(AppTheme.BACKGROUND);
+    // ── BODY ─────────────────────────────────────────────────────────
+    private JPanel buildBody() {
+        JPanel body = new JPanel(new BorderLayout());
+        body.setBackground(AppTheme.WARM_BG);
+        body.add(buildToolbar(),   BorderLayout.NORTH);
+        body.add(buildTableCard(), BorderLayout.CENTER);
+        return body;
+    }
+
+    // ── TOOLBAR: search + filters + stats ────────────────────────────
+    private JPanel buildToolbar() {
+        JPanel toolbar = new JPanel(new BorderLayout(0, 0));
+        toolbar.setBackground(AppTheme.WARM_BG);
+        toolbar.setBorder(new EmptyBorder(0, AppTheme.PAD_LG, AppTheme.PAD_SM, AppTheme.PAD_LG));
+
+        // Top row: search / filter / buttons
+        JPanel topRow = new JPanel(new BorderLayout(0, 0));
+        topRow.setBackground(AppTheme.WARM_CARD);
+        topRow.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(1, 1, 0, 1, AppTheme.WARM_BORDER),
+                new EmptyBorder(8, 12, 8, 12)));
+
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        left.setOpaque(false);
+
         left.add(lbl("Search:"));
-
         fldSearch = new JTextField(22);
         fldSearch.setFont(AppTheme.FONT_BODY);
+        fldSearch.putClientProperty("JTextField.placeholderText", "Client name, Tax ID, status...");
         fldSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-                applyFilter();
-            }
-
-            @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                applyFilter();
-            }
-
-            @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                applyFilter();
-            }
+            public void insertUpdate(javax.swing.event.DocumentEvent e)  { applyFilter(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e)  { applyFilter(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { applyFilter(); }
         });
         left.add(fldSearch);
 
         left.add(lbl("  Status:"));
-        cmbStatusFilter = new JComboBox<>(new String[] {
-                "All",
-                TaxReturn.STATUS_FILED,
-                TaxReturn.STATUS_PENDING,
-                TaxReturn.STATUS_OVERDUE
+        cmbStatusFilter = new JComboBox<>(new String[]{
+                "All", TaxReturn.STATUS_FILED, TaxReturn.STATUS_PENDING, TaxReturn.STATUS_OVERDUE
         });
         cmbStatusFilter.setFont(AppTheme.FONT_BODY);
         cmbStatusFilter.addActionListener(e -> applyFilter());
         left.add(cmbStatusFilter);
 
-        // Action buttons
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
-        right.setBackground(AppTheme.BACKGROUND);
-
-        JButton btnRefresh = styledBtn("Refresh", AppTheme.PRIMARY_BLUE);
-        JButton btnCsv = styledBtn("Export CSV", AppTheme.WARNING_AMBER);
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        right.setOpaque(false);
+        JButton btnRefresh = AppTheme.primaryBtn("Refresh");
+        JButton btnCsv     = AppTheme.warnBtn("Export CSV");
         btnRefresh.addActionListener(e -> loadData());
         btnCsv.addActionListener(e -> CsvExporter.exportReturns(taxReturnService.getAllTaxReturns(), this));
         right.add(btnRefresh);
         right.add(btnCsv);
 
-        bar.add(left, BorderLayout.WEST);
-        bar.add(right, BorderLayout.EAST);
+        topRow.add(left,  BorderLayout.WEST);
+        topRow.add(right, BorderLayout.EAST);
 
-        // Stats mini-bar
-        JPanel statsBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 3));
-        statsBar.setBackground(new Color(0xEC, 0xEF, 0xF5));
-        statsBar.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, AppTheme.BORDER_COLOR));
+        // Stats strip
+        JPanel statsStrip = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
+        statsStrip.setBackground(AppTheme.WARM_HEADER);
+        statsStrip.setBorder(BorderFactory.createCompoundBorder(
+                new MatteBorder(1, 1, 1, 1, AppTheme.WARM_BORDER),
+                new EmptyBorder(0, 8, 0, 8)));
 
-        lblStatTotal = statChip("Total: 0", AppTheme.PRIMARY_BLUE);
-        lblStatFiled = statChip("Filed: 0", AppTheme.ACCENT_GREEN);
-        lblStatPending = statChip("Pending: 0", AppTheme.WARNING_AMBER);
-        lblStatOverdue = statChip("Overdue: 0", AppTheme.ALERT_RED);
+        lblStatTotal   = chip("Total: 0",   AppTheme.PRIMARY_BLUE);
+        lblStatFiled   = chip("Filed: 0",   AppTheme.FILED_TEXT);
+        lblStatPending = chip("Pending: 0", AppTheme.PENDING_TEXT);
+        lblStatOverdue = chip("Overdue: 0", AppTheme.OVERDUE_TEXT);
 
-        statsBar.add(lblStatTotal);
-        statsBar.add(lbl(" | "));
-        statsBar.add(lblStatFiled);
-        statsBar.add(lbl(" | "));
-        statsBar.add(lblStatPending);
-        statsBar.add(lbl(" | "));
-        statsBar.add(lblStatOverdue);
+        statsStrip.add(lblStatTotal);
+        statsStrip.add(new JSeparator(SwingConstants.VERTICAL) {{ setPreferredSize(new Dimension(1, 16)); }});
+        statsStrip.add(lblStatFiled);
+        statsStrip.add(new JSeparator(SwingConstants.VERTICAL) {{ setPreferredSize(new Dimension(1, 16)); }});
+        statsStrip.add(lblStatPending);
+        statsStrip.add(new JSeparator(SwingConstants.VERTICAL) {{ setPreferredSize(new Dimension(1, 16)); }});
+        statsStrip.add(lblStatOverdue);
 
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(AppTheme.BACKGROUND);
-        wrapper.add(bar, BorderLayout.NORTH);
-
-        JPanel bottomWrap = new JPanel(new BorderLayout());
-        bottomWrap.setBackground(AppTheme.BACKGROUND);
-        bottomWrap.add(new JSeparator(), BorderLayout.NORTH);
-        bottomWrap.add(statsBar, BorderLayout.CENTER);
-
-        wrapper.add(bottomWrap, BorderLayout.SOUTH);
-        return wrapper;
+        toolbar.add(topRow,     BorderLayout.NORTH);
+        toolbar.add(statsStrip, BorderLayout.SOUTH);
+        return toolbar;
     }
 
-    // ── TABLE ─────────────────────────────────────────────────────────
-    private JPanel buildTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AppTheme.BACKGROUND);
-        panel.setBorder(new EmptyBorder(0, 12, 12, 12));
+    // ── TABLE CARD ───────────────────────────────────────────────────
+    private JPanel buildTableCard() {
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AppTheme.WARM_BG);
+        wrapper.setBorder(new EmptyBorder(0, AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_LG));
 
-        String[] cols = {
-                "Tax ID", "Full Name", "Filing Date",
-                "Tax Liability (VND)", "Status", "Marital Status"
-        };
+        String[] cols = {"Tax ID", "Full Name", "Filing Date", "Tax Liability (VND)", "Status", "Marital Status"};
         tableModel = new DefaultTableModel(cols, 0) {
-            @Override
-            public boolean isCellEditable(int r, int c) {
-                return false;
-            }
+            @Override public boolean isCellEditable(int r, int c) { return false; }
         };
+
         table = new JTable(tableModel) {
             @Override
-            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                if (isRowSelected(row)) {
-                    c.setBackground(AppTheme.SELECTION_BG);
-                    c.setForeground(Color.WHITE);
-                } else {
-                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
-                    c.setForeground(AppTheme.TEXT_PRIMARY);
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int col) {
+                Component c = super.prepareRenderer(renderer, row, col);
+                if (col != 4) {
+                    if (isRowSelected(row)) {
+                        c.setBackground(AppTheme.TABLE_SELECTION_BG);
+                        c.setForeground(AppTheme.TABLE_SELECTION_FG);
+                    } else {
+                        c.setBackground(row % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE);
+                        c.setForeground(AppTheme.TEXT_PRIMARY);
+                    }
                 }
                 return c;
             }
         };
-        table.setFont(AppTheme.FONT_BODY);
-        table.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
-        table.setRowHeight(26);
-        table.setGridColor(AppTheme.BORDER_COLOR);
-        table.setSelectionBackground(AppTheme.SELECTION_BG);
-        table.setSelectionForeground(Color.WHITE);
+        AppTheme.styleTable(table);
 
-        int[] widths = { 120, 160, 110, 170, 110, 120 };
+        // Status badge — colors ONLY the status cell
+        table.getColumnModel().getColumn(4).setCellRenderer(
+                (t, val, sel, foc, r, c) -> {
+                    String v = val == null ? "" : val.toString();
+                    Color rowBg = r % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE;
+                    return AppTheme.createStatusLabel(v, sel, rowBg, AppTheme.TABLE_SELECTION_BG);
+                });
+
+        int[] widths = {120, 160, 110, 170, 110, 120};
         for (int i = 0; i < widths.length; i++)
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
-
-        // Colour-code the Status column (index 4) — text color only, no background box
-        table.getColumnModel().getColumn(4).setCellRenderer((t, val, sel, foc, r, c) -> {
-            String v = val == null ? "" : val.toString();
-            Color rowBg = r % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA);
-            return AppTheme.createStatusLabel(v, sel, rowBg, AppTheme.SELECTION_BG);
-        });
 
         sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
 
         JScrollPane scroll = new JScrollPane(table);
-        scroll.setBorder(BorderFactory.createLineBorder(AppTheme.BORDER_COLOR));
-        panel.add(scroll, BorderLayout.CENTER);
+        scroll.setBorder(new MatteBorder(1, 1, 1, 1, AppTheme.WARM_BORDER));
 
         lblRowCount = new JLabel("Showing 0 of 0 records");
-        lblRowCount.setFont(AppTheme.FONT_SMALL);
+        lblRowCount.setFont(AppTheme.FONT_CAPTION);
         lblRowCount.setForeground(AppTheme.TEXT_SECONDARY);
-        lblRowCount.setBorder(new EmptyBorder(4, 4, 0, 0));
-        panel.add(lblRowCount, BorderLayout.SOUTH);
+        lblRowCount.setBorder(new EmptyBorder(5, 2, 0, 0));
 
-        return panel;
+        wrapper.add(scroll,      BorderLayout.CENTER);
+        wrapper.add(lblRowCount, BorderLayout.SOUTH);
+        return wrapper;
     }
 
     // ── DATA ──────────────────────────────────────────────────────────
@@ -202,12 +201,10 @@ public class ReturnsPanel extends JPanel {
         for (TaxReturn tr : returns) {
             String name = "Unknown";
             Client c = clientService.findClientById(tr.getClientId());
-            if (c != null)
-                name = c.getName();
+            if (c != null) name = c.getName();
 
-            tableModel.addRow(new Object[] {
-                    tr.getClientId(),
-                    name,
+            tableModel.addRow(new Object[]{
+                    tr.getClientId(), name,
                     tr.getFilingDate(),
                     VndFormatter.format(tr.getTaxLiability()),
                     tr.getStatus(),
@@ -216,7 +213,7 @@ public class ReturnsPanel extends JPanel {
         }
 
         int totalClients = clientService.getAllClients().size();
-        long filed = taxReturnService.getFiledCount(returns);
+        long filed   = taxReturnService.getFiledCount(returns);
         long overdue = taxReturnService.getOverdueCount(returns);
         long pending = taxReturnService.getPendingCount(totalClients, returns);
 
@@ -229,21 +226,18 @@ public class ReturnsPanel extends JPanel {
     }
 
     private void applyFilter() {
-        String text = fldSearch.getText().trim();
+        String text      = fldSearch.getText().trim();
         String statusSel = (String) cmbStatusFilter.getSelectedItem();
 
-        RowFilter<DefaultTableModel, Object> textFilter = null;
+        RowFilter<DefaultTableModel, Object> textFilter   = null;
         RowFilter<DefaultTableModel, Object> statusFilter = null;
 
         if (!text.isEmpty()) {
-            try {
-                textFilter = RowFilter.regexFilter("(?i)" + text, 0, 1, 4, 5);
-            } catch (java.util.regex.PatternSyntaxException ignored) {
-            }
+            try { textFilter = RowFilter.regexFilter("(?i)" + text, 0, 1, 4, 5); }
+            catch (java.util.regex.PatternSyntaxException ignored) {}
         }
         if (statusSel != null && !"All".equals(statusSel)) {
-            statusFilter = RowFilter.regexFilter(
-                    "(?i)^" + Pattern.quote(statusSel) + "$", 4);
+            statusFilter = RowFilter.regexFilter("(?i)^" + Pattern.quote(statusSel) + "$", 4);
         }
 
         if (textFilter != null && statusFilter != null)
@@ -255,35 +249,22 @@ public class ReturnsPanel extends JPanel {
         else
             sorter.setRowFilter(null);
 
-        int visibleCount = table.getRowCount();
-        int totalCount = tableModel.getRowCount();
-        if (lblRowCount != null) {
-            lblRowCount.setText("Showing " + visibleCount + " of " + totalCount + " records");
-        }
+        if (lblRowCount != null)
+            lblRowCount.setText("Showing " + table.getRowCount() + " of " + tableModel.getRowCount() + " records");
     }
 
     // ── HELPERS ──────────────────────────────────────────────────────
     private JLabel lbl(String text) {
         JLabel l = new JLabel(text);
         l.setFont(AppTheme.FONT_BODY);
+        l.setForeground(AppTheme.TEXT_PRIMARY);
         return l;
     }
 
-    private JLabel statChip(String text, Color color) {
+    private JLabel chip(String text, Color color) {
         JLabel l = new JLabel(text);
         l.setFont(new Font("Segoe UI", Font.BOLD, 12));
         l.setForeground(color);
         return l;
-    }
-
-    private JButton styledBtn(String text, Color bg) {
-        JButton btn = new JButton(text);
-        btn.setFont(AppTheme.FONT_BUTTON);
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(6, 14, 6, 14));
-        return btn;
     }
 }

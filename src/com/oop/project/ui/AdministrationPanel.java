@@ -6,6 +6,7 @@ import com.oop.project.util.AppTheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -18,80 +19,80 @@ import java.util.List;
 
 public class AdministrationPanel extends JPanel {
 
-    private final User currentUser;
+    private final User           currentUser;
     private final UserRepository userRepository;
-    private JTable table;
+    private JTable         table;
     private UserTableModel tableModel;
 
     public AdministrationPanel(User user) {
-        this.currentUser = user;
+        this.currentUser    = user;
         this.userRepository = new UserRepository();
         initializeUI();
         loadData();
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout(10, 10));
-        setBackground(AppTheme.BACKGROUND);
-        setBorder(new EmptyBorder(16, 20, 16, 20));
+        setLayout(new BorderLayout());
+        setBackground(AppTheme.WARM_BG);
 
-        add(buildTopPanel(), BorderLayout.NORTH);
-        add(buildTablePanel(), BorderLayout.CENTER);
-        add(buildBottomPanel(), BorderLayout.SOUTH);
+        add(buildPageHeader(),  BorderLayout.NORTH);
+        add(buildTableCard(),   BorderLayout.CENTER);
+        add(buildBottomBar(),   BorderLayout.SOUTH);
     }
 
-    private JPanel buildTopPanel() {
-        JPanel topPanel = new JPanel(new BorderLayout(0, 4));
-        topPanel.setBackground(AppTheme.BACKGROUND);
+    // ── PAGE HEADER ──────────────────────────────────────────────────
+    private JPanel buildPageHeader() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(AppTheme.WARM_BG);
+        p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
 
-        JLabel lblTitle = new JLabel("System Administration  (Admin Only)");
-        lblTitle.setFont(AppTheme.FONT_TITLE);
-        lblTitle.setForeground(AppTheme.PRIMARY_BLUE);
+        JLabel title = new JLabel("Administration");
+        title.setFont(AppTheme.FONT_H1);
+        title.setForeground(AppTheme.TEXT_PRIMARY);
 
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        String info = String.format("Logged in as: %s  |  Role: %s  |  Session: %s",
-                currentUser.getUsername(), currentUser.getRole(), time);
-        JLabel lblInfo = new JLabel(info);
-        lblInfo.setFont(AppTheme.FONT_BODY);
-        lblInfo.setForeground(AppTheme.TEXT_SECONDARY);
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        JLabel info = new JLabel("Session: " + currentUser.getUsername() + "  ·  " + currentUser.getRole() + "  ·  " + time);
+        info.setFont(AppTheme.FONT_CAPTION);
+        info.setForeground(AppTheme.TEXT_SECONDARY);
 
-        JButton btnRefresh = styledBtn("Refresh", AppTheme.PRIMARY_BLUE);
+        JButton btnRefresh = AppTheme.primaryBtn("Refresh");
         btnRefresh.addActionListener(e -> loadData());
 
-        JPanel titleRow = new JPanel(new BorderLayout());
-        titleRow.setBackground(AppTheme.BACKGROUND);
-        titleRow.add(lblTitle, BorderLayout.WEST);
-        titleRow.add(btnRefresh, BorderLayout.EAST);
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        right.setOpaque(false);
+        right.add(btnRefresh);
 
-        topPanel.add(titleRow, BorderLayout.NORTH);
-        topPanel.add(lblInfo, BorderLayout.SOUTH);
-        return topPanel;
+        JPanel left = new JPanel(new BorderLayout(0, 4));
+        left.setOpaque(false);
+        left.add(title, BorderLayout.NORTH);
+        left.add(info,  BorderLayout.SOUTH);
+
+        p.add(left,  BorderLayout.WEST);
+        p.add(right, BorderLayout.EAST);
+        return p;
     }
 
-    private JScrollPane buildTablePanel() {
+    // ── TABLE CARD ───────────────────────────────────────────────────
+    private JScrollPane buildTableCard() {
         tableModel = new UserTableModel();
         table = new JTable(tableModel) {
             @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                if (column != 3) {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+                Component c = super.prepareRenderer(renderer, row, col);
+                if (col != 3) {
                     if (isRowSelected(row)) {
-                        c.setBackground(AppTheme.SELECTION_BG);
-                        c.setForeground(Color.WHITE);
+                        c.setBackground(AppTheme.TABLE_SELECTION_BG);
+                        c.setForeground(AppTheme.TABLE_SELECTION_FG);
                     } else {
-                        c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
+                        c.setBackground(row % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE);
                         c.setForeground(AppTheme.TEXT_PRIMARY);
                     }
                 }
                 return c;
             }
         };
-        table.setFont(AppTheme.FONT_BODY);
-        table.getTableHeader().setFont(AppTheme.FONT_BODY.deriveFont(Font.BOLD));
-        table.setRowHeight(36);
-        table.setGridColor(AppTheme.BORDER_COLOR);
-        table.setSelectionBackground(AppTheme.SELECTION_BG);
-        table.setSelectionForeground(Color.WHITE);
+        AppTheme.styleTable(table);
+        table.setRowHeight(38);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(120);
@@ -100,47 +101,46 @@ public class AdministrationPanel extends JPanel {
         table.getColumnModel().getColumn(3).setPreferredWidth(180);
 
         boolean isAdmin = "ADMIN".equals(currentUser.getRole());
-        ActionsPanel actionsPanel = new ActionsPanel(isAdmin);
-        table.getColumnModel().getColumn(3).setCellRenderer(actionsPanel);
-        table.getColumnModel().getColumn(3).setCellEditor(actionsPanel);
+        ActionsPanel actions = new ActionsPanel(isAdmin);
+        table.getColumnModel().getColumn(3).setCellRenderer(actions);
+        table.getColumnModel().getColumn(3).setCellEditor(actions);
 
         JScrollPane scroll = new JScrollPane(table);
-        scroll.setBorder(BorderFactory.createLineBorder(AppTheme.BORDER_COLOR));
+        scroll.setBorder(new MatteBorder(0, AppTheme.PAD_LG, 0, AppTheme.PAD_LG, AppTheme.WARM_BG));
         return scroll;
     }
 
-    private JPanel buildBottomPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AppTheme.BACKGROUND);
-        panel.setBorder(new EmptyBorder(8, 0, 0, 0));
+    // ── BOTTOM BAR ───────────────────────────────────────────────────
+    private JPanel buildBottomBar() {
+        JPanel bar = new JPanel(new BorderLayout());
+        bar.setBackground(AppTheme.WARM_BG);
+        bar.setBorder(new EmptyBorder(AppTheme.PAD_SM, AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_LG));
 
         if (!"ADMIN".equals(currentUser.getRole())) {
             JLabel msg = new JLabel("Admin privileges required to manage users.");
             msg.setFont(AppTheme.FONT_BODY);
             msg.setForeground(AppTheme.ALERT_RED);
-            panel.add(msg, BorderLayout.WEST);
-            return panel;
+            bar.add(msg, BorderLayout.WEST);
+            return bar;
         }
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        btnPanel.setBackground(AppTheme.BACKGROUND);
+        btnPanel.setOpaque(false);
 
-        JButton btnAdd = styledBtn("+ Add User", AppTheme.ACCENT_GREEN);
-        JButton btnReset = styledBtn("Reset Password", AppTheme.WARNING_AMBER);
-
-        btnAdd.addActionListener(e -> showAddUserDialog());
+        JButton btnAdd   = AppTheme.successBtn("+ Add User");
+        JButton btnReset = AppTheme.warnBtn("Reset Password");
+        btnAdd.addActionListener(e   -> showAddUserDialog());
         btnReset.addActionListener(e -> showResetPasswordDialog());
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnReset);
-        panel.add(btnPanel, BorderLayout.EAST);
-        return panel;
+        bar.add(btnPanel, BorderLayout.EAST);
+        return bar;
     }
 
     // ── DATA ──────────────────────────────────────────────────────────
     public void loadData() {
-        List<User> users = userRepository.loadUsers();
-        tableModel.setUsers(users);
+        tableModel.setUsers(userRepository.loadUsers());
     }
 
     // ── DIALOGS ───────────────────────────────────────────────────────
@@ -153,52 +153,46 @@ public class AdministrationPanel extends JPanel {
         JPanel form = new JPanel(new GridLayout(4, 2, 8, 8));
         form.setBorder(new EmptyBorder(16, 20, 8, 20));
 
-        JTextField fldUsername = new JTextField();
-        JTextField fldFullName = new JTextField();
+        JTextField    fldUsername = new JTextField();
+        JTextField    fldFullName = new JTextField();
         JPasswordField fldPassword = new JPasswordField();
         JComboBox<String> cmbRole = new JComboBox<>(new String[]{"TAX_STAFF", "ADMIN"});
 
-        form.add(new JLabel("Username:")); form.add(fldUsername);
-        form.add(new JLabel("Full Name:")); form.add(fldFullName);
-        form.add(new JLabel("Password:")); form.add(fldPassword);
-        form.add(new JLabel("Role:")); form.add(cmbRole);
+        form.add(new JLabel("Username:"));   form.add(fldUsername);
+        form.add(new JLabel("Full Name:"));  form.add(fldFullName);
+        form.add(new JLabel("Password:"));   form.add(fldPassword);
+        form.add(new JLabel("Role:"));       form.add(cmbRole);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
-        JButton btnSave = styledBtn("Save", AppTheme.ACCENT_GREEN);
-        JButton btnCancel = styledBtn("Cancel", AppTheme.TEXT_SECONDARY);
+        JButton btnSave   = AppTheme.successBtn("Save");
+        JButton btnCancel = AppTheme.ghostBtn("Cancel");
 
         btnSave.addActionListener(e -> {
             String username = fldUsername.getText().trim();
             String fullName = fldFullName.getText().trim();
             String password = new String(fldPassword.getPassword()).trim();
-            String role = (String) cmbRole.getSelectedItem();
+            String role     = (String) cmbRole.getSelectedItem();
 
             if (username.isEmpty() || fullName.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "All fields are required.", "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "All fields are required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (userRepository.findUserByUsername(username) != null) {
-                JOptionPane.showMessageDialog(dlg, "Username already exists.", "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Username already exists.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             List<User> existing = userRepository.loadUsers();
             String staffId = String.format("NV%03d", existing.size() + 1);
-            User newUser = new User(staffId, username, password, role, fullName, "", "");
-            userRepository.addUser(newUser);
+            userRepository.addUser(new User(staffId, username, password, role, fullName, "", ""));
             loadData();
             dlg.dispose();
-            JOptionPane.showMessageDialog(this, "User '" + username + "' added successfully.",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User '" + username + "' added.", "Success", JOptionPane.INFORMATION_MESSAGE);
         });
         btnCancel.addActionListener(e -> dlg.dispose());
 
         btnPanel.add(btnSave);
         btnPanel.add(btnCancel);
-
-        dlg.add(form, BorderLayout.CENTER);
+        dlg.add(form,     BorderLayout.CENTER);
         dlg.add(btnPanel, BorderLayout.SOUTH);
         dlg.setVisible(true);
     }
@@ -218,39 +212,35 @@ public class AdministrationPanel extends JPanel {
 
         JTextField fldUsernameRO = new JTextField(u.getUsername());
         fldUsernameRO.setEditable(false);
-        fldUsernameRO.setBackground(new Color(0xF0, 0xF0, 0xF0));
+        fldUsernameRO.setBackground(AppTheme.WARM_STRIPE);
         JTextField fldFullName = new JTextField(u.getFullName());
         JComboBox<String> cmbRole = new JComboBox<>(new String[]{"TAX_STAFF", "ADMIN"});
         cmbRole.setSelectedItem(u.getRole());
 
         form.add(new JLabel("Username (read-only):")); form.add(fldUsernameRO);
-        form.add(new JLabel("Full Name:")); form.add(fldFullName);
-        form.add(new JLabel("Role:")); form.add(cmbRole);
+        form.add(new JLabel("Full Name:"));            form.add(fldFullName);
+        form.add(new JLabel("Role:"));                 form.add(cmbRole);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
-        JButton btnSave = styledBtn("Save Changes", AppTheme.PRIMARY_BLUE);
-        JButton btnCancel = styledBtn("Cancel", AppTheme.TEXT_SECONDARY);
+        JButton btnSave   = AppTheme.primaryBtn("Save Changes");
+        JButton btnCancel = AppTheme.ghostBtn("Cancel");
 
         btnSave.addActionListener(e -> {
             String fullName = fldFullName.getText().trim();
-            String role = (String) cmbRole.getSelectedItem();
             if (fullName.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "Full name cannot be empty.", "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Full name cannot be empty.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            userRepository.updateUser(u.getUsername(), fullName, role);
+            userRepository.updateUser(u.getUsername(), fullName, (String) cmbRole.getSelectedItem());
             loadData();
             dlg.dispose();
-            JOptionPane.showMessageDialog(this, "User updated successfully.", "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User updated.", "Success", JOptionPane.INFORMATION_MESSAGE);
         });
         btnCancel.addActionListener(e -> dlg.dispose());
 
         btnPanel.add(btnSave);
         btnPanel.add(btnCancel);
-
-        dlg.add(form, BorderLayout.CENTER);
+        dlg.add(form,     BorderLayout.CENTER);
         dlg.add(btnPanel, BorderLayout.SOUTH);
         dlg.setVisible(true);
     }
@@ -259,32 +249,26 @@ public class AdministrationPanel extends JPanel {
         List<User> users = userRepository.loadUsers();
         if (modelRow < 0 || modelRow >= users.size()) return;
         User u = users.get(modelRow);
-
         if (u.getUsername().equals(currentUser.getUsername())) {
-            JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to delete user: " + u.getUsername() + "?",
+                "Delete user: " + u.getUsername() + "?",
                 "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirm == JOptionPane.YES_OPTION) {
             userRepository.deleteUser(u.getUsername());
             loadData();
-            JOptionPane.showMessageDialog(this, "User deleted.", "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User deleted.", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     private void showResetPasswordDialog() {
         List<User> users = userRepository.loadUsers();
         if (users.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No users found.", "Info",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No users found.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-
         JDialog dlg = new JDialog(SwingUtilities.getWindowAncestor(this), "Reset Password", ModalityType.APPLICATION_MODAL);
         dlg.setLayout(new BorderLayout(10, 10));
         dlg.setSize(400, 230);
@@ -294,44 +278,38 @@ public class AdministrationPanel extends JPanel {
         form.setBorder(new EmptyBorder(16, 20, 8, 20));
 
         String[] usernames = users.stream().map(User::getUsername).toArray(String[]::new);
-        JComboBox<String> cmbUser = new JComboBox<>(usernames);
-        JPasswordField fldNew = new JPasswordField();
-        JPasswordField fldConfirm = new JPasswordField();
+        JComboBox<String> cmbUser  = new JComboBox<>(usernames);
+        JPasswordField fldNew      = new JPasswordField();
+        JPasswordField fldConfirm  = new JPasswordField();
 
-        form.add(new JLabel("Select User:")); form.add(cmbUser);
-        form.add(new JLabel("New Password:")); form.add(fldNew);
-        form.add(new JLabel("Confirm Password:")); form.add(fldConfirm);
+        form.add(new JLabel("Select User:"));       form.add(cmbUser);
+        form.add(new JLabel("New Password:"));      form.add(fldNew);
+        form.add(new JLabel("Confirm Password:"));  form.add(fldConfirm);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
-        JButton btnReset = styledBtn("Reset", AppTheme.WARNING_AMBER);
-        JButton btnCancel = styledBtn("Cancel", AppTheme.TEXT_SECONDARY);
+        JButton btnReset  = AppTheme.warnBtn("Reset");
+        JButton btnCancel = AppTheme.ghostBtn("Cancel");
 
         btnReset.addActionListener(e -> {
-            String username = (String) cmbUser.getSelectedItem();
-            String newPwd = new String(fldNew.getPassword());
+            String newPwd  = new String(fldNew.getPassword());
             String confirm = new String(fldConfirm.getPassword());
-
             if (newPwd.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "Password cannot be empty.", "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Password cannot be empty.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (!newPwd.equals(confirm)) {
-                JOptionPane.showMessageDialog(dlg, "Passwords do not match.", "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Passwords do not match.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            userRepository.updatePassword(username, newPwd);
+            userRepository.updatePassword((String) cmbUser.getSelectedItem(), newPwd);
             dlg.dispose();
-            JOptionPane.showMessageDialog(this, "Password reset successfully for " + username + ".",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Password reset successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
         });
         btnCancel.addActionListener(e -> dlg.dispose());
 
         btnPanel.add(btnReset);
         btnPanel.add(btnCancel);
-
-        dlg.add(form, BorderLayout.CENTER);
+        dlg.add(form,     BorderLayout.CENTER);
         dlg.add(btnPanel, BorderLayout.SOUTH);
         dlg.setVisible(true);
     }
@@ -341,20 +319,15 @@ public class AdministrationPanel extends JPanel {
         private final String[] COLS = {"Username", "Full Name", "Role", "Actions"};
         private List<User> users = new ArrayList<>();
 
-        void setUsers(List<User> users) {
-            this.users = new ArrayList<>(users);
-            fireTableDataChanged();
-        }
+        void setUsers(List<User> u) { this.users = new ArrayList<>(u); fireTableDataChanged(); }
+        List<User> getUsers()       { return users; }
 
-        List<User> getUsers() { return users; }
+        @Override public int    getRowCount()                { return users.size(); }
+        @Override public int    getColumnCount()             { return COLS.length; }
+        @Override public String getColumnName(int col)       { return COLS[col]; }
+        @Override public boolean isCellEditable(int r, int c){ return c == 3; }
 
-        @Override public int getRowCount() { return users.size(); }
-        @Override public int getColumnCount() { return COLS.length; }
-        @Override public String getColumnName(int col) { return COLS[col]; }
-        @Override public boolean isCellEditable(int row, int col) { return col == 3; }
-
-        @Override
-        public Object getValueAt(int row, int col) {
+        @Override public Object getValueAt(int row, int col) {
             User u = users.get(row);
             switch (col) {
                 case 0: return u.getUsername();
@@ -366,32 +339,23 @@ public class AdministrationPanel extends JPanel {
         }
     }
 
-    // ── ACTIONS COLUMN RENDERER/EDITOR ────────────────────────────────
+    // ── ACTIONS COLUMN ────────────────────────────────────────────────
     private class ActionsPanel extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
-        private final JPanel panel;
+        private final JPanel  panel;
         private final JButton btnEdit;
         private final JButton btnDelete;
         private int currentRow = -1;
 
         ActionsPanel(boolean isAdmin) {
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
+            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 5));
             panel.setOpaque(true);
 
-            btnEdit = new JButton("Edit");
+            btnEdit   = AppTheme.primaryBtn("Edit");
+            btnDelete = AppTheme.dangerBtn("Delete");
             btnEdit.setFont(AppTheme.FONT_SMALL.deriveFont(Font.BOLD));
-            btnEdit.setBackground(AppTheme.PRIMARY_BLUE);
-            btnEdit.setForeground(Color.WHITE);
-            btnEdit.setFocusPainted(false);
-            btnEdit.setBorder(new EmptyBorder(4, 10, 4, 10));
-            btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-            btnDelete = new JButton("Delete");
             btnDelete.setFont(AppTheme.FONT_SMALL.deriveFont(Font.BOLD));
-            btnDelete.setBackground(AppTheme.ALERT_RED);
-            btnDelete.setForeground(Color.WHITE);
-            btnDelete.setFocusPainted(false);
+            btnEdit.setBorder(new EmptyBorder(4, 10, 4, 10));
             btnDelete.setBorder(new EmptyBorder(4, 10, 4, 10));
-            btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             btnEdit.addActionListener(e -> {
                 fireEditingStopped();
@@ -406,46 +370,22 @@ public class AdministrationPanel extends JPanel {
                 panel.add(btnEdit);
                 panel.add(btnDelete);
             } else {
-                JLabel noAccess = new JLabel("No access");
-                noAccess.setForeground(AppTheme.TEXT_SECONDARY);
-                noAccess.setFont(AppTheme.FONT_SMALL);
-                panel.add(noAccess);
+                JLabel na = new JLabel("No access");
+                na.setFont(AppTheme.FONT_SMALL);
+                na.setForeground(AppTheme.TEXT_SECONDARY);
+                panel.add(na);
             }
         }
 
-        private JPanel preparePanel(int row, boolean isSelected) {
+        private JPanel prep(int row, boolean selected) {
             currentRow = row;
-            Color bg = isSelected ? AppTheme.SELECTION_BG
-                    : (row % 2 == 0 ? Color.WHITE : new Color(0xF8, 0xF9, 0xFA));
-            panel.setBackground(bg);
+            panel.setBackground(selected ? AppTheme.TABLE_SELECTION_BG
+                    : (row % 2 == 0 ? AppTheme.WARM_CARD : AppTheme.WARM_STRIPE));
             return panel;
         }
 
-        @Override
-        public Component getTableCellRendererComponent(JTable tbl, Object val,
-                boolean isSelected, boolean hasFocus, int row, int col) {
-            return preparePanel(row, isSelected);
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable tbl, Object val,
-                boolean isSelected, int row, int col) {
-            return preparePanel(row, true);
-        }
-
-        @Override
-        public Object getCellEditorValue() { return null; }
-    }
-
-    // ── HELPERS ───────────────────────────────────────────────────────
-    private JButton styledBtn(String text, Color bg) {
-        JButton btn = new JButton(text);
-        btn.setFont(AppTheme.FONT_BUTTON);
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(6, 14, 6, 14));
-        return btn;
+        @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean foc, int row, int col) { return prep(row, sel); }
+        @Override public Component getTableCellEditorComponent(JTable t, Object v, boolean sel, int row, int col) { return prep(row, true); }
+        @Override public Object getCellEditorValue() { return null; }
     }
 }
