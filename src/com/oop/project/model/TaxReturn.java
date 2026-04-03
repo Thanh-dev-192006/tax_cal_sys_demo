@@ -5,15 +5,8 @@ import java.time.LocalDate;
 
 public class TaxReturn implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    // =====================================================
-    // TRẠNG THÁI TỜ KHAI (FR-3)
-    // =====================================================
-    /** Filed on time (on or before April 30) */
     public static final String STATUS_FILED   = "Filed";
-    /** Not yet submitted */
     public static final String STATUS_PENDING = "Pending";
-    /** Filed after the April 30 deadline */
     public static final String STATUS_OVERDUE = "Overdue";
 
     private String clientId;

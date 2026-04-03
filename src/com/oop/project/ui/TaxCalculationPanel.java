@@ -7,14 +7,13 @@ import com.oop.project.service.TaxReturnService;
 import com.oop.project.util.AppTheme;
 import com.oop.project.util.TaxCalculator;
 import com.oop.project.util.VndFormatter;
-
+import java.awt.*;
+import java.time.LocalDate;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.time.LocalDate;
 
 public class TaxCalculationPanel extends JPanel {
 
@@ -390,7 +389,7 @@ public class TaxCalculationPanel extends JPanel {
         txtIncome.setText("");
         spnDependents.setValue(0);
         cmbMarital.setSelectedIndex(0);
-        currentClient = null;
+        currentClient = null; 
         lblSearchResult.setText("No client selected");
         lblSearchResult.setForeground(AppTheme.TEXT_SECONDARY);
         resetCards();
@@ -406,9 +405,9 @@ public class TaxCalculationPanel extends JPanel {
     }
 
     private String placeholderHtml() {
-        return "<html><body style='color:#7A7265; font-family:Segoe UI; padding:28px; text-align:center;'>"
-                + "Enter a Client Tax ID above and click <b>Load Data</b><br>"
-                + "to view the detailed tax breakdown by income bracket.</body></html>";
+        return "<html><body style='color:#7A7265; font-family:Segoe UI; padding:28px; text-align:center;'>" 
+                + "Enter a Client Tax ID above and click <b>Load Data</b><br>" 
+                + "to view the detailed tax breakdown by income bracket.</body></html>"; 
     }
 
     private JLabel lbl(String text) {

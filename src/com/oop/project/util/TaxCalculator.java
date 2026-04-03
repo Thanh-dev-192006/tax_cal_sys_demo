@@ -3,59 +3,59 @@ package com.oop.project.util;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-
+//
 /**
- * TaxCalculator — Vietnamese Progressive Income Tax (Thue TNCN)
- *
- * Formula:
- *   Monthly taxable = max(0, monthly income − personal deduction − dependent deductions)
- *   Annual taxable  = monthly taxable × 12
- *   Tax             = apply 7-bracket progressive rates to annual taxable income
- *
- * FR-2.1: Parallel arrays for income thresholds and tax rates
- * FR-2.2: Determine applicable tax rate based on income
- * FR-2.3: Calculate final tax liability using progressive brackets
- */
-public final class TaxCalculator {
+ * TaxCalculator — Vietnamese Progressive Income Tax (Thue TNCN) 
+ * 
+ * Formula: 
+ *   Monthly taxable = max(0, monthly income − personal deduction − dependent deductions) 
+ *   Annual taxable  = monthly taxable × 12 
+ *   Tax             = apply 7-bracket progressive rates to annual taxable income 
+ * 
+ * FR-2.1: Parallel arrays for income thresholds and tax rates 
+ * FR-2.2: Determine applicable tax rate based on income 
+ * FR-2.3: Calculate final tax liability using progressive brackets 
+ */  
+public final class TaxCalculator { 
 
-    // ================================================================
-    // FR-2.1  PARALLEL ARRAYS — Annual taxable income thresholds (VND)
-    // ================================================================
+    // ================================================================ 
+    // FR-2.1  PARALLEL ARRAYS — Annual taxable income thresholds (VND) 
+    // ================================================================ 
     private static final double[] ANNUAL_THRESHOLDS = {
-         60_000_000,   // Bracket 1: up to  60M/year  ( ≤ 5M/month)   →  5%
-        120_000_000,   // Bracket 2: 60–120M/year     (5–10M/month)    → 10%
-        216_000_000,   // Bracket 3: 120–216M/year    (10–18M/month)   → 15%
-        384_000_000,   // Bracket 4: 216–384M/year    (18–32M/month)   → 20%
-        624_000_000,   // Bracket 5: 384–624M/year    (32–52M/month)   → 25%
-        960_000_000,   // Bracket 6: 624–960M/year    (52–80M/month)   → 30%
-        Double.MAX_VALUE // Bracket 7: over 960M/year (>80M/month)     → 35%
-    };
-
-    private static final double[] RATES = {
-        0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35
-    };
-
-    private static final String[] BRACKET_LABELS = {
-        "Bracket 1 (up to 5M/month)",
-        "Bracket 2 (5–10M/month)",
-        "Bracket 3 (10–18M/month)",
-        "Bracket 4 (18–32M/month)",
-        "Bracket 5 (32–52M/month)",
-        "Bracket 6 (52–80M/month)",
-        "Bracket 7 (over 80M/month)"
-    };
-
-    /** Personal deduction: 11,000,000 VND / month */
-    public static final double PERSONAL_DEDUCTION_MONTHLY  = 11_000_000.0;
-    /** Dependent deduction: 4,400,000 VND / month / person */
-    public static final double DEPENDENT_DEDUCTION_MONTHLY = 4_400_000.0;
-
-    private static final DecimalFormat DF;
-    static {
-        DecimalFormatSymbols sym = new DecimalFormatSymbols(Locale.US);
-        sym.setGroupingSeparator(',');
-        sym.setDecimalSeparator('.');
-        DF = new DecimalFormat("#,##0", sym);
+         60_000_000,   // Bracket 1: up to  60M/year  ( ≤ 5M/month)   →  5% 
+        120_000_000,   // Bracket 2: 60–120M/year     (5–10M/month)    → 10% 
+        216_000_000,   // Bracket 3: 120–216M/year    (10–18M/month)   → 15% 
+        384_000_000,   // Bracket 4: 216–384M/year    (18–32M/month)   → 20% 
+        624_000_000,   // Bracket 5: 384–624M/year    (32–52M/month)   → 25% 
+        960_000_000,   // Bracket 6: 624–960M/year    (52–80M/month)   → 30% 
+        Double.MAX_VALUE // Bracket 7: over 960M/year (>80M/month)     → 35% 
+    }; 
+ 
+    private static final double[] RATES = { 
+        0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35 
+    }; 
+ 
+    private static final String[] BRACKET_LABELS = { 
+        "Bracket 1 (up to 5M/month)", 
+        "Bracket 2 (5–10M/month)", 
+        "Bracket 3 (10–18M/month)", 
+        "Bracket 4 (18–32M/month)", 
+        "Bracket 5 (32–52M/month)", 
+        "Bracket 6 (52–80M/month)", 
+        "Bracket 7 (over 80M/month)" 
+    }; 
+ 
+    /** Personal deduction: 11,000,000 VND / month */ 
+    public static final double PERSONAL_DEDUCTION_MONTHLY  = 11_000_000.0; 
+    /** Dependent deduction: 4,400,000 VND / month / person */ 
+    public static final double DEPENDENT_DEDUCTION_MONTHLY = 4_400_000.0; 
+ 
+    private static final DecimalFormat DF; 
+    static { 
+        DecimalFormatSymbols sym = new DecimalFormatSymbols(Locale.US); 
+        sym.setGroupingSeparator(','); 
+        sym.setDecimalSeparator('.'); 
+        DF = new DecimalFormat("#,##0", sym); 
     }
 
     // ================================================================
