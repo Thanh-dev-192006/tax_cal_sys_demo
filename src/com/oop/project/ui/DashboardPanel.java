@@ -16,6 +16,27 @@ import java.util.List;
 
 public class DashboardPanel extends JPanel {
 
+    private ImageIcon loadLogo(int targetWidth, int targetHeight) {
+        ImageIcon icon = null;
+        try {
+            java.net.URL url = getClass().getResource("/logo.png");
+            if (url != null) {
+                icon = new ImageIcon(url);
+            } else {
+                icon = new ImageIcon("logo.png");
+            }
+            if (icon != null && icon.getIconWidth() > 0) {
+                Image scaled = icon.getImage().getScaledInstance(
+                    targetWidth, targetHeight, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo not found: " + e.getMessage());
+        }
+        return null;
+    }
+
     private final ClientService    clientService    = new ClientService();
     private final TaxReturnService taxReturnService = new TaxReturnService();
 
@@ -49,14 +70,21 @@ public class DashboardPanel extends JPanel {
         p.setBackground(AppTheme.WARM_BG);
         p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
 
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        titlePanel.setOpaque(false);
+        ImageIcon logoIcon = loadLogo(28, 28);
+        if (logoIcon != null) {
+            titlePanel.add(new JLabel(logoIcon));
+        }
         JLabel title = new JLabel("System Overview");
         title.setFont(AppTheme.FONT_H1);
-        title.setForeground(AppTheme.TEXT_PRIMARY);
+        title.setForeground(AppTheme.PRIMARY_DARK_RED);
+        titlePanel.add(title);
 
         JButton btnRefresh = AppTheme.primaryBtn("Refresh");
         btnRefresh.addActionListener(e -> refresh());
 
-        p.add(title,      BorderLayout.WEST);
+        p.add(titlePanel, BorderLayout.WEST);
         p.add(btnRefresh, BorderLayout.EAST);
         return p;
     }
@@ -85,7 +113,7 @@ public class DashboardPanel extends JPanel {
         valPending      = buildCard(grid, "\u25A0", "Pending Returns",          "0",     AppTheme.WARNING_AMBER);
         valOverdue      = buildCard(grid, "\u25A0", "Overdue",                  "0",     AppTheme.ALERT_RED);
         valTotalTax     = buildCard(grid, "\u25A0", "Total Tax Collected (VND)","0 VND", AppTheme.ACCENT_BLUE);
-        valAvgTax       = buildCard(grid, "\u25A0", "Avg Tax / Client (VND)",   "0 VND", new Color(0x6A, 0x1B, 0x9A));
+        valAvgTax       = buildCard(grid, "\u25A0", "Avg Tax / Client (VND)",   "0 VND", AppTheme.PURPLE);
 
         wrapper.add(grid, BorderLayout.CENTER);
         return wrapper;

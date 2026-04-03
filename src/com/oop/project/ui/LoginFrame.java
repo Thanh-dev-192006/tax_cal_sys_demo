@@ -25,6 +25,27 @@ public class LoginFrame extends JFrame {
         initializeUI();
     }
 
+    private ImageIcon loadLogo(int targetWidth, int targetHeight) {
+        ImageIcon icon = null;
+        try {
+            java.net.URL url = getClass().getResource("/logo.png");
+            if (url != null) {
+                icon = new ImageIcon(url);
+            } else {
+                icon = new ImageIcon("logo.png");
+            }
+            if (icon != null && icon.getIconWidth() > 0) {
+                Image scaled = icon.getImage().getScaledInstance(
+                    targetWidth, targetHeight, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo not found: " + e.getMessage());
+        }
+        return null;
+    }
+
     private void initializeUI() {
         setTitle("VTAX — Tax Return Management System");
         setSize(720, 500);
@@ -47,7 +68,7 @@ public class LoginFrame extends JFrame {
         SwingUtilities.invokeLater(() -> usernameField.requestFocusInWindow());
     }
 
-    // ── LEFT: dark branding panel ────────────────────────────────────
+    // ── LEFT: dark red branding panel ────────────────────────────────
     private JPanel buildBrandPanel() {
         JPanel panel = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics g) {
@@ -63,31 +84,42 @@ public class LoginFrame extends JFrame {
                 g2.dispose();
             }
         };
-        panel.setBackground(AppTheme.SIDEBAR_BG);
+        panel.setBackground(AppTheme.PRIMARY_DARK_RED);
         panel.setPreferredSize(new Dimension(265, 0));
         panel.setBorder(new EmptyBorder(40, 30, 40, 30));
 
-        // Top: brand name + tagline
+        // Top: logo + brand name + tagline
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.setOpaque(false);
 
+        // Logo — centered, 100×100px
+        ImageIcon logoLarge = loadLogo(100, 100);
+        if (logoLarge != null) {
+            JLabel logoLabel = new JLabel(logoLarge);
+            logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            top.add(logoLabel);
+            top.add(Box.createVerticalStrut(14));
+        }
+
         JLabel lblBrand = new JLabel("VTAX");
         lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 42));
-        lblBrand.setForeground(AppTheme.SIDEBAR_ACCENT);
-        lblBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblBrand.setForeground(AppTheme.TEXT_ON_DARK);
+        lblBrand.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblBrand.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Gold divider line
+        // Gold accent divider line
         JPanel accentBar = new JPanel();
-        accentBar.setBackground(AppTheme.SIDEBAR_ACCENT);
+        accentBar.setBackground(AppTheme.ACCENT_GOLD);
         accentBar.setMaximumSize(new Dimension(48, 3));
         accentBar.setPreferredSize(new Dimension(48, 3));
-        accentBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        accentBar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel lblTitle = new JLabel("<html>Vietnam Tax<br>Management<br>System</html>");
         lblTitle.setFont(new Font("Segoe UI", Font.PLAIN, 17));
-        lblTitle.setForeground(new Color(0xB8, 0xC4, 0xD0));
-        lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblTitle.setForeground(new Color(0xF0, 0xD0, 0xD0));
+        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
         top.add(lblBrand);
         top.add(Box.createVerticalStrut(14));
@@ -102,12 +134,12 @@ public class LoginFrame extends JFrame {
 
         JLabel lblTagline = new JLabel("<html><i>Trusted by tax professionals<br>across Vietnam.</i></html>");
         lblTagline.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblTagline.setForeground(new Color(0x4A, 0x5A, 0x6A));
+        lblTagline.setForeground(new Color(0xD0, 0x90, 0x90));
         lblTagline.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblVersion = new JLabel("Version 1.0  ·  AI66A Project 6");
         lblVersion.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblVersion.setForeground(new Color(0x30, 0x3E, 0x4C));
+        lblVersion.setForeground(new Color(0xA0, 0x60, 0x60));
         lblVersion.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         bottom.add(lblTagline);
@@ -116,7 +148,7 @@ public class LoginFrame extends JFrame {
 
         // Right edge divider
         JPanel divider = new JPanel();
-        divider.setBackground(new Color(0x1E, 0x28, 0x38));
+        divider.setBackground(new Color(0xA0, 0x30, 0x30));
         divider.setPreferredSize(new Dimension(1, 0));
 
         panel.add(top,     BorderLayout.NORTH);
@@ -185,7 +217,7 @@ public class LoginFrame extends JFrame {
         // Login button
         loginButton = new JButton("LOGIN");
         loginButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        loginButton.setBackground(AppTheme.SIDEBAR_BG);
+        loginButton.setBackground(AppTheme.PRIMARY_DARK_RED);
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
         loginButton.setBorderPainted(false);
@@ -197,7 +229,7 @@ public class LoginFrame extends JFrame {
         form.add(Box.createVerticalStrut(14));
 
         // Hint
-        JLabel hint = new JLabel("<html><span style='color:#7A7265'>Admin: admin / admin123 &nbsp;·&nbsp; Staff: nhanvien1 / Staff@123</span></html>");
+        JLabel hint = new JLabel("<html><span style='color:#757575'>Admin: admin / admin123 &nbsp;·&nbsp; Staff: nhanvien1 / Staff@123</span></html>");
         hint.setFont(new Font("Segoe UI", Font.ITALIC, 10));
         hint.setAlignmentX(Component.LEFT_ALIGNMENT);
         form.add(hint);
