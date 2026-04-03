@@ -17,6 +17,27 @@ import javax.swing.event.DocumentListener;
 
 public class TaxCalculationPanel extends JPanel {
 
+    private ImageIcon loadLogo(int targetWidth, int targetHeight) {
+        ImageIcon icon = null;
+        try {
+            java.net.URL url = getClass().getResource("/logo.png");
+            if (url != null) {
+                icon = new ImageIcon(url);
+            } else {
+                icon = new ImageIcon("logo.png");
+            }
+            if (icon != null && icon.getIconWidth() > 0) {
+                Image scaled = icon.getImage().getScaledInstance(
+                    targetWidth, targetHeight, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo not found: " + e.getMessage());
+        }
+        return null;
+    }
+
     private final ClientService    clientService    = new ClientService();
     private final TaxReturnService taxReturnService = new TaxReturnService();
 
@@ -48,10 +69,17 @@ public class TaxCalculationPanel extends JPanel {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(AppTheme.WARM_BG);
         p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        titlePanel.setOpaque(false);
+        ImageIcon logoIcon = loadLogo(28, 28);
+        if (logoIcon != null) {
+            titlePanel.add(new JLabel(logoIcon));
+        }
         JLabel title = new JLabel("Tax Filing");
         title.setFont(AppTheme.FONT_H1);
-        title.setForeground(AppTheme.TEXT_PRIMARY);
-        p.add(title, BorderLayout.WEST);
+        title.setForeground(AppTheme.PRIMARY_DARK_RED);
+        titlePanel.add(title);
+        p.add(titlePanel, BorderLayout.WEST);
         return p;
     }
 

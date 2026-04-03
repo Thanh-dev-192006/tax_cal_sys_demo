@@ -36,6 +36,27 @@ public class MainFrame extends JFrame {
         initializeUI();
     }
 
+    private ImageIcon loadLogo(int targetWidth, int targetHeight) {
+        ImageIcon icon = null;
+        try {
+            java.net.URL url = getClass().getResource("/logo.png");
+            if (url != null) {
+                icon = new ImageIcon(url);
+            } else {
+                icon = new ImageIcon("logo.png");
+            }
+            if (icon != null && icon.getIconWidth() > 0) {
+                Image scaled = icon.getImage().getScaledInstance(
+                    targetWidth, targetHeight, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo not found: " + e.getMessage());
+        }
+        return null;
+    }
+
     private void initializeUI() {
         setTitle("VTAX — Vietnam Tax Return Management System");
         setSize(1200, 800);
@@ -88,22 +109,36 @@ public class MainFrame extends JFrame {
         brand.setBackground(AppTheme.SIDEBAR_BG);
         brand.setBorder(new EmptyBorder(22, 20, 18, 20));
 
+        // Logo + text row
+        JPanel textRow = new JPanel(new BorderLayout(10, 0));
+        textRow.setOpaque(false);
+
+        // 28×28 logo in sidebar brand
+        ImageIcon logoIcon = loadLogo(28, 28);
+        if (logoIcon != null) {
+            JLabel logoLabel = new JLabel(logoIcon);
+            logoLabel.setVerticalAlignment(SwingConstants.TOP);
+            textRow.add(logoLabel, BorderLayout.WEST);
+        }
+
         JLabel lblVtax = new JLabel("VTAX");
         lblVtax.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblVtax.setForeground(AppTheme.SIDEBAR_ACCENT);
+        lblVtax.setForeground(AppTheme.TEXT_ON_DARK);
 
         JLabel lblSub = new JLabel("Tax Management System");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblSub.setForeground(new Color(0x40, 0x50, 0x60));
+        lblSub.setForeground(new Color(0xD0, 0x90, 0x90));
 
         JPanel text = new JPanel(new GridLayout(2, 1, 0, 2));
         text.setOpaque(false);
         text.add(lblVtax);
         text.add(lblSub);
-        brand.add(text, BorderLayout.CENTER);
+        textRow.add(text, BorderLayout.CENTER);
+
+        brand.add(textRow, BorderLayout.CENTER);
 
         JPanel line = new JPanel();
-        line.setBackground(AppTheme.SIDEBAR_DIVIDER);
+        line.setBackground(new Color(0xA0, 0x30, 0x30));
         line.setPreferredSize(new Dimension(0, 1));
         brand.add(line, BorderLayout.SOUTH);
         return brand;
@@ -132,7 +167,7 @@ public class MainFrame extends JFrame {
     private void addNavItem(JPanel parent, String key, String label) {
         JButton btn = new JButton(label);
         btn.setFont(AppTheme.FONT_NAV);
-        btn.setForeground(AppTheme.SIDEBAR_TEXT);
+        btn.setForeground(AppTheme.TEXT_ON_DARK);
         btn.setBackground(AppTheme.SIDEBAR_BG);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -147,13 +182,13 @@ public class MainFrame extends JFrame {
             public void mouseEntered(MouseEvent e) {
                 if (!key.equals(currentPage)) {
                     btn.setBackground(AppTheme.SIDEBAR_HOVER);
-                    btn.setForeground(Color.WHITE);
+                    btn.setForeground(AppTheme.TEXT_PRIMARY);
                 }
             }
             public void mouseExited(MouseEvent e) {
                 if (!key.equals(currentPage)) {
                     btn.setBackground(AppTheme.SIDEBAR_BG);
-                    btn.setForeground(AppTheme.SIDEBAR_TEXT);
+                    btn.setForeground(AppTheme.TEXT_ON_DARK);
                 }
             }
         });
@@ -174,18 +209,18 @@ public class MainFrame extends JFrame {
         if (navButtons.containsKey(currentPage)) {
             JButton prev = navButtons.get(currentPage);
             prev.setBackground(AppTheme.SIDEBAR_BG);
-            prev.setForeground(AppTheme.SIDEBAR_TEXT);
+            prev.setForeground(AppTheme.TEXT_ON_DARK);
             prev.setBorder(new EmptyBorder(11, 20, 11, 16));
         }
         currentPage = key;
 
-        // Activate current — left gold accent bar
+        // Activate current — left dark red accent bar
         if (navButtons.containsKey(key)) {
             JButton btn = navButtons.get(key);
             btn.setBackground(AppTheme.SIDEBAR_ACTIVE);
-            btn.setForeground(Color.WHITE);
+            btn.setForeground(AppTheme.TEXT_PRIMARY);
             btn.setBorder(BorderFactory.createCompoundBorder(
-                    new MatteBorder(0, 3, 0, 0, AppTheme.SIDEBAR_ACCENT),
+                    new MatteBorder(0, 3, 0, 0, AppTheme.PRIMARY_DARK_RED),
                     new EmptyBorder(11, 17, 11, 16)));
         }
 
@@ -206,7 +241,7 @@ public class MainFrame extends JFrame {
 
     private JPanel buildSidebarUser() {
         JPanel area = new JPanel(new BorderLayout(8, 0));
-        area.setBackground(new Color(0x0C, 0x12, 0x1A));
+        area.setBackground(new Color(0x6B, 0x10, 0x10));
         area.setBorder(new EmptyBorder(14, 18, 14, 14));
 
         String displayName = (currentUser != null
@@ -222,7 +257,7 @@ public class MainFrame extends JFrame {
 
         JLabel lblRole = new JLabel(role);
         lblRole.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblRole.setForeground(AppTheme.SIDEBAR_ACCENT);
+        lblRole.setForeground(AppTheme.ACCENT_GOLD);
 
         JPanel nameStack = new JPanel(new GridLayout(2, 1, 0, 1));
         nameStack.setOpaque(false);
@@ -231,14 +266,14 @@ public class MainFrame extends JFrame {
 
         JButton btnLogout = new JButton("Logout");
         btnLogout.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        btnLogout.setForeground(new Color(0x60, 0x70, 0x80));
-        btnLogout.setBackground(new Color(0x0C, 0x12, 0x1A));
+        btnLogout.setForeground(new Color(0xD0, 0x90, 0x90));
+        btnLogout.setBackground(new Color(0x6B, 0x10, 0x10));
         btnLogout.setBorderPainted(false);
         btnLogout.setFocusPainted(false);
         btnLogout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnLogout.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) { btnLogout.setForeground(Color.WHITE); }
-            public void mouseExited(MouseEvent e)  { btnLogout.setForeground(new Color(0x60, 0x70, 0x80)); }
+            public void mouseExited(MouseEvent e)  { btnLogout.setForeground(new Color(0xD0, 0x90, 0x90)); }
         });
         btnLogout.addActionListener(e -> {
             int c = JOptionPane.showConfirmDialog(this,
@@ -262,13 +297,13 @@ public class MainFrame extends JFrame {
         JPanel bar = new JPanel(new BorderLayout());
         bar.setBackground(Color.WHITE);
         bar.setBorder(BorderFactory.createCompoundBorder(
-                new MatteBorder(0, 0, 1, 0, AppTheme.WARM_BORDER),
+                new MatteBorder(0, 0, 1, 0, AppTheme.BORDER_LIGHT),
                 new EmptyBorder(0, 20, 0, 20)));
         bar.setPreferredSize(new Dimension(0, 46));
 
         lblBreadcrumb = new JLabel("Dashboard");
         lblBreadcrumb.setFont(AppTheme.FONT_H2);
-        lblBreadcrumb.setForeground(AppTheme.TEXT_PRIMARY);
+        lblBreadcrumb.setForeground(AppTheme.PRIMARY_DARK_RED);
 
         JLabel lblClock = new JLabel();
         lblClock.setFont(AppTheme.FONT_CAPTION);
@@ -287,14 +322,14 @@ public class MainFrame extends JFrame {
     // ── STATUS BAR ───────────────────────────────────────────────────
     private JPanel buildStatusBar() {
         JPanel bar = new JPanel(new BorderLayout());
-        bar.setBackground(AppTheme.WARM_HEADER);
+        bar.setBackground(AppTheme.PRIMARY_DARK_RED);
         bar.setBorder(BorderFactory.createCompoundBorder(
-                new MatteBorder(1, 0, 0, 0, AppTheme.WARM_BORDER),
+                new MatteBorder(1, 0, 0, 0, AppTheme.BORDER_LIGHT),
                 new EmptyBorder(3, 16, 3, 16)));
 
         JLabel lbl = new JLabel("VTAX  ·  Vietnam Personal Income Tax Return System  ·  v1.0");
         lbl.setFont(AppTheme.FONT_CAPTION);
-        lbl.setForeground(AppTheme.TEXT_SECONDARY);
+        lbl.setForeground(AppTheme.TEXT_ON_DARK);
 
         bar.add(lbl, BorderLayout.WEST);
         return bar;

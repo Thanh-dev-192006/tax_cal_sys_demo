@@ -11,10 +11,10 @@ public class Main {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             // Tùy chỉnh màu nền và font chữ toàn cục
-            UIManager.put("control", new java.awt.Color(0xF5, 0xF7, 0xFA));
-            UIManager.put("nimbusBase", new java.awt.Color(0x15, 0x65, 0xC0));
-            UIManager.put("nimbusBlueGrey", new java.awt.Color(0x8E, 0xA9, 0xC7));
-            UIManager.put("nimbusFocus", new java.awt.Color(0x15, 0x65, 0xC0));
+            UIManager.put("control", new java.awt.Color(0xF5, 0xF5, 0xF5));
+            UIManager.put("nimbusBase", new java.awt.Color(0x8B, 0x1A, 0x1A));
+            UIManager.put("nimbusBlueGrey", new java.awt.Color(0xE0, 0xE0, 0xE0));
+            UIManager.put("nimbusFocus", new java.awt.Color(0x8B, 0x1A, 0x1A));
             UIManager.put("defaultFont", new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 13));
         } catch (Exception e) {
             // Fallback: dùng System Look & Feel

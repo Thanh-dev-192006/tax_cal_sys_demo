@@ -7,83 +7,98 @@ import java.awt.*;
 
 public final class AppTheme {
 
-    // ===================== ORIGINAL COLORS (kept for compatibility) =====================
-    public static final Color BACKGROUND      = new Color(0xF4, 0xF1, 0xEC);
-    public static final Color CARD_BG         = Color.WHITE;
-    public static final Color BORDER_COLOR    = new Color(0xE2, 0xDD, 0xD6);
-    public static final Color TEXT_PRIMARY    = new Color(0x1C, 0x1C, 0x1C);
-    public static final Color TEXT_SECONDARY  = new Color(0x7A, 0x72, 0x65);
-    public static final Color PRIMARY_BLUE    = new Color(0x1A, 0x3A, 0x5C);
-    public static final Color ACCENT_BLUE     = new Color(0x1A, 0x5C, 0xA8);
-    public static final Color ACCENT_GREEN    = new Color(0x1E, 0x6B, 0x45);
-    public static final Color WARNING_AMBER   = new Color(0x96, 0x5B, 0x00);
-    public static final Color ALERT_RED       = new Color(0xA5, 0x28, 0x20);
-    public static final Color LIGHT_BLUE_BG   = new Color(0xDC, 0xE8, 0xF7);
-    public static final Color SELECTION_BG    = new Color(0xDC, 0xE8, 0xF7);
-    public static final Color DARK_BLUE       = new Color(0x0D, 0x47, 0xA1);
-    public static final Color PURPLE          = new Color(0x6A, 0x1B, 0x9A);
-    public static final Color PANEL_HEADER_BG = new Color(0x10, 0x18, 0x20);
-    public static final Color LIGHT_GREEN_BG  = new Color(0xE6, 0xF4, 0xED);
-    public static final Color LIGHT_RED_BG    = new Color(0xFD, 0xE9, 0xE7);
-    public static final Color LIGHT_AMBER_BG  = new Color(0xFD, 0xF3, 0xD8);
+    // ===================== NEW COLOR PALETTE =====================
+    public static final Color PRIMARY_DARK_RED = new Color(0x8B, 0x1A, 0x1A);  // #8B1A1A
+    public static final Color PRIMARY_RED = new Color(0xC0, 0x39, 0x2B);       // #C0392B
+    public static final Color ACCENT_TERRACOTTA = new Color(0xC0, 0x6B, 0x3A); // #C06B3A
+    public static final Color ACCENT_GOLD = new Color(0xD4, 0xA0, 0x17);       // #D4A017
+    public static final Color BACKGROUND_WHITE = new Color(0xFF, 0xFF, 0xFF);  // #FFFFFF
+    public static final Color BACKGROUND_LIGHT = new Color(0xF5, 0xF5, 0xF5);  // #F5F5F5
+    public static final Color BACKGROUND_WARM = new Color(0xFA, 0xF0, 0xE6);   // #FAF0E6
+    public static final Color BORDER_LIGHT = new Color(0xE0, 0xE0, 0xE0);      // #E0E0E0
+    public static final Color STATUS_SUCCESS = new Color(0x27, 0xAE, 0x60);    // #27AE60
+    public static final Color STATUS_WARNING = new Color(0xE6, 0x7E, 0x22);    // #E67E22
+    public static final Color STATUS_ERROR = new Color(0xC0, 0x39, 0x2B);      // #C0392B
+
+    // ===================== COMPATIBILITY ALIASES =====================
+    public static final Color BACKGROUND = BACKGROUND_LIGHT;
+    public static final Color CARD_BG = BACKGROUND_WHITE;
+    public static final Color BORDER_COLOR = BORDER_LIGHT;
+    public static final Color TEXT_PRIMARY = new Color(0x21, 0x21, 0x21);    // #212121
+    public static final Color TEXT_SECONDARY = new Color(0x75, 0x75, 0x75);  // #757575
+    public static final Color PRIMARY_BLUE = PRIMARY_DARK_RED;
+    public static final Color ACCENT_BLUE = ACCENT_TERRACOTTA;
+    public static final Color ACCENT_GREEN = STATUS_SUCCESS;
+    public static final Color WARNING_AMBER = STATUS_WARNING;
+    public static final Color ALERT_RED = STATUS_ERROR;
+    public static final Color LIGHT_BLUE_BG = BACKGROUND_WARM;
+    public static final Color SELECTION_BG = BACKGROUND_WARM;
+    public static final Color DARK_BLUE = PRIMARY_DARK_RED;
+    public static final Color PURPLE = ACCENT_GOLD;
+    public static final Color PANEL_HEADER_BG = PRIMARY_DARK_RED;
+    public static final Color LIGHT_GREEN_BG = new Color(0xE8, 0xF5, 0xE9);
+    public static final Color LIGHT_RED_BG = new Color(0xFD, 0xE9, 0xE7);
+    public static final Color LIGHT_AMBER_BG = new Color(0xFD, 0xF3, 0xD8);
     public static final Color LIGHT_PURPLE_BG = new Color(0xF3, 0xE5, 0xF5);
-    public static final Color LIGHT_NAVY_BG   = new Color(0xDC, 0xE8, 0xF7);
-    public static final Color TEXT_WHITE      = Color.WHITE;
+    public static final Color LIGHT_NAVY_BG = BACKGROUND_WARM;
+    public static final Color TEXT_WHITE = Color.WHITE;
+    public static final Color TEXT_ON_DARK = Color.WHITE;
 
     // ===================== ORIGINAL FONTS (kept for compatibility) =====================
-    public static final Font FONT_TITLE      = new Font("Segoe UI", Font.BOLD, 20);
-    public static final Font FONT_SUBTITLE   = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font FONT_BODY       = new Font("Segoe UI", Font.PLAIN, 13);
-    public static final Font FONT_SMALL      = new Font("Segoe UI", Font.PLAIN, 11);
-    public static final Font FONT_BUTTON     = new Font("Segoe UI", Font.BOLD, 13);
-    public static final Font FONT_STAT       = new Font("Consolas", Font.BOLD, 28);
+    public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
+    public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.BOLD, 14);
+    public static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 13);
+    public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
+    public static final Font FONT_BUTTON = new Font("Segoe UI", Font.BOLD, 13);
+    public static final Font FONT_STAT = new Font("Consolas", Font.BOLD, 28);
     public static final Font FONT_CARD_VALUE = new Font("Consolas", Font.BOLD, 20);
     public static final Font FONT_CARD_LABEL = new Font("Segoe UI", Font.PLAIN, 11);
-    public static final Font FONT_MONO       = new Font("Consolas", Font.PLAIN, 12);
+    public static final Font FONT_MONO = new Font("Consolas", Font.PLAIN, 12);
 
-    // ===================== NEW DESIGN SYSTEM — SIDEBAR =====================
-    public static final Color SIDEBAR_BG      = new Color(0x10, 0x18, 0x20);
-    public static final Color SIDEBAR_HOVER   = new Color(0x1A, 0x26, 0x34);
-    public static final Color SIDEBAR_ACTIVE  = new Color(0x18, 0x26, 0x38);
-    public static final Color SIDEBAR_ACCENT  = new Color(0xC8, 0x94, 0x3A);
-    public static final Color SIDEBAR_TEXT    = new Color(0x7A, 0x8A, 0x9A);
-    public static final Color SIDEBAR_DIVIDER = new Color(0x1E, 0x28, 0x38);
+    // ===================== SIDEBAR =====================
+    public static final Color SIDEBAR_BG = PRIMARY_DARK_RED;
+    public static final Color SIDEBAR_HOVER = BACKGROUND_LIGHT;
+    public static final Color SIDEBAR_ACTIVE = BACKGROUND_WARM;
+    public static final Color SIDEBAR_ACCENT = PRIMARY_DARK_RED;
+    public static final Color SIDEBAR_TEXT = new Color(0x75, 0x75, 0x75);
+    public static final Color SIDEBAR_DIVIDER = BORDER_LIGHT;
 
-    // ===================== NEW DESIGN SYSTEM — CONTENT AREA =====================
-    public static final Color WARM_BG      = new Color(0xF4, 0xF1, 0xEC);
-    public static final Color WARM_BORDER  = new Color(0xE2, 0xDD, 0xD6);
-    public static final Color WARM_CARD    = new Color(0xFF, 0xFF, 0xFF);
-    public static final Color WARM_STRIPE  = new Color(0xF9, 0xF7, 0xF4);
-    public static final Color WARM_HEADER  = new Color(0xF0, 0xEE, 0xE9);
+    // ===================== CONTENT AREA =====================
+    public static final Color WARM_BG = BACKGROUND_LIGHT;
+    public static final Color WARM_BORDER = BORDER_LIGHT;
+    public static final Color WARM_CARD = BACKGROUND_WHITE;
+    public static final Color WARM_STRIPE = BACKGROUND_LIGHT;
+    public static final Color WARM_HEADER = PRIMARY_DARK_RED;
 
-    // ===================== NEW DESIGN SYSTEM — TABLE SELECTION =====================
-    public static final Color TABLE_SELECTION_BG = new Color(0xDC, 0xE8, 0xF7);
-    public static final Color TABLE_SELECTION_FG = new Color(0x1C, 0x1C, 0x1C);
+    // ===================== TABLE SELECTION =====================
+    public static final Color TABLE_SELECTION_BG = new Color(0xE8, 0xC8, 0xB8);  // warmer, more visible
+    public static final Color TABLE_SELECTION_FG = TEXT_PRIMARY;
 
-    // ===================== NEW DESIGN SYSTEM — STATUS BADGES =====================
-    public static final Color FILED_TEXT   = new Color(0x1E, 0x6B, 0x45);
-    public static final Color FILED_BG     = new Color(0xE6, 0xF4, 0xED);
-    public static final Color PENDING_TEXT = new Color(0x96, 0x5B, 0x00);
-    public static final Color PENDING_BG   = new Color(0xFD, 0xF3, 0xD8);
-    public static final Color OVERDUE_TEXT = new Color(0xA5, 0x28, 0x20);
-    public static final Color OVERDUE_BG   = new Color(0xFD, 0xE9, 0xE7);
+    // ===================== STATUS BADGES =====================
+    public static final Color FILED_TEXT = STATUS_SUCCESS;
+    public static final Color FILED_BG = new Color(0xE8, 0xF5, 0xE9);
+    public static final Color PENDING_TEXT = STATUS_WARNING;
+    public static final Color PENDING_BG = new Color(0xFD, 0xF3, 0xD8);
+    public static final Color OVERDUE_TEXT = STATUS_ERROR;
+    public static final Color OVERDUE_BG = new Color(0xFD, 0xE9, 0xE7);
 
-    // ===================== NEW DESIGN SYSTEM — SPACING =====================
+    // ===================== SPACING =====================
     public static final int PAD_SM = 8;
     public static final int PAD_MD = 16;
     public static final int PAD_LG = 24;
     public static final int PAD_XL = 32;
 
-    // ===================== NEW DESIGN SYSTEM — FONTS =====================
+    // ===================== FONTS =====================
     public static final Font FONT_DISPLAY = new Font("Segoe UI", Font.BOLD, 22);
-    public static final Font FONT_H1      = new Font("Segoe UI", Font.BOLD, 18);
-    public static final Font FONT_H2      = new Font("Segoe UI", Font.BOLD, 15);
-    public static final Font FONT_H3      = new Font("Segoe UI", Font.BOLD, 13);
-    public static final Font FONT_NAV     = new Font("Segoe UI", Font.PLAIN, 13);
+    public static final Font FONT_H1 = new Font("Segoe UI", Font.BOLD, 18);
+    public static final Font FONT_H2 = new Font("Segoe UI", Font.BOLD, 15);
+    public static final Font FONT_H3 = new Font("Segoe UI", Font.BOLD, 13);
+    public static final Font FONT_NAV = new Font("Segoe UI", Font.PLAIN, 13);
     public static final Font FONT_CAPTION = new Font("Segoe UI", Font.PLAIN, 11);
-    public static final Font FONT_NUM     = new Font("Consolas", Font.BOLD, 24);
+    public static final Font FONT_NUM = new Font("Consolas", Font.BOLD, 24);
 
-    private AppTheme() {}
+    private AppTheme() {
+    }
 
     public static void applyFlatLafCustomizations() {
         UIManager.put("Button.arc", 6);
@@ -94,15 +109,13 @@ public final class AppTheme {
         UIManager.put("ScrollBar.width", 8);
         UIManager.put("TextField.placeholderForeground", new Color(180, 180, 180));
         UIManager.put("TabbedPane.selectedBackground", Color.WHITE);
-        // Readable table selection — light bg, dark text
+        // Readable table selection — warm bg, dark text
         UIManager.put("Table.selectionBackground", TABLE_SELECTION_BG);
         UIManager.put("Table.selectionForeground", TABLE_SELECTION_FG);
     }
 
     /**
      * Creates a stat card with a top accent line (3px) and dark monospace value.
-     * The returned JPanel's BorderLayout.CENTER contains the value JLabel
-     * so callers can retrieve it via ((BorderLayout) p.getLayout()).getLayoutComponent(BorderLayout.CENTER).
      */
     public static JPanel createStatCard(String icon, String title, String value, Color accentColor) {
         JPanel card = new JPanel(new BorderLayout(0, 6));
@@ -132,10 +145,11 @@ public final class AppTheme {
     }
 
     /**
-     * Status badge renderer component — colors only this cell, not the row.
+     * Status badge renderer — foreground-only coloring for status.
+     * CRITICAL: status colors are setForeground() ONLY — no setBackground() on status cells.
      */
     public static JLabel createStatusLabel(String status, boolean isSelected,
-                                            Color rowBg, Color selectionBg) {
+            Color rowBg, Color selectionBg) {
         JLabel lbl = new JLabel(status, SwingConstants.LEFT);
         lbl.setOpaque(true);
         lbl.setBorder(new EmptyBorder(2, 7, 2, 7));
@@ -145,17 +159,15 @@ public final class AppTheme {
             lbl.setBackground(TABLE_SELECTION_BG);
             lbl.setForeground(TABLE_SELECTION_FG);
         } else {
+            // Background matches the row — status color is foreground only
+            lbl.setBackground(rowBg);
             if ("Filed".equalsIgnoreCase(status)) {
-                lbl.setBackground(FILED_BG);
                 lbl.setForeground(FILED_TEXT);
             } else if ("Pending".equalsIgnoreCase(status)) {
-                lbl.setBackground(PENDING_BG);
                 lbl.setForeground(PENDING_TEXT);
             } else if ("Overdue".equalsIgnoreCase(status)) {
-                lbl.setBackground(OVERDUE_BG);
                 lbl.setForeground(OVERDUE_TEXT);
             } else {
-                lbl.setBackground(rowBg);
                 lbl.setForeground(TEXT_PRIMARY);
             }
         }
@@ -166,11 +178,29 @@ public final class AppTheme {
     public static void styleTable(JTable table) {
         table.setFont(FONT_BODY);
         table.getTableHeader().setFont(FONT_H3);
-        table.getTableHeader().setBackground(WARM_HEADER);
-        table.getTableHeader().setForeground(TEXT_SECONDARY);
-        table.getTableHeader().setBorder(new MatteBorder(0, 0, 1, 0, WARM_BORDER));
+        table.getTableHeader().setBackground(PRIMARY_DARK_RED);
+        table.getTableHeader().setForeground(TEXT_ON_DARK);
+        table.getTableHeader().setOpaque(true);
+        // Nimbus ignores setBackground/setForeground on headers — force via custom renderer
+        table.getTableHeader().setDefaultRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable t, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(t, value, isSelected, hasFocus, row, column);
+                lbl.setBackground(PRIMARY_DARK_RED);
+                lbl.setForeground(TEXT_ON_DARK);
+                lbl.setFont(FONT_H3);
+                lbl.setOpaque(true);
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+                lbl.setBorder(BorderFactory.createCompoundBorder(
+                        new MatteBorder(0, 0, 1, 1, new Color(0xA0, 0x30, 0x30)),
+                        new EmptyBorder(4, 8, 4, 8)));
+                return lbl;
+            }
+        });
+        table.getTableHeader().setBorder(new MatteBorder(0, 0, 1, 0, BORDER_LIGHT));
         table.setRowHeight(30);
-        table.setGridColor(WARM_BORDER);
+        table.setGridColor(BORDER_LIGHT);
         table.setShowVerticalLines(false);
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setSelectionBackground(TABLE_SELECTION_BG);
@@ -179,19 +209,19 @@ public final class AppTheme {
 
     // ── Shared button factories ──────────────────────────────────────
     public static JButton primaryBtn(String text) {
-        return styledBtn(text, SIDEBAR_BG, Color.WHITE);
+        return styledBtn(text, PRIMARY_DARK_RED, TEXT_ON_DARK);
     }
 
     public static JButton successBtn(String text) {
-        return styledBtn(text, ACCENT_GREEN, Color.WHITE);
+        return styledBtn(text, STATUS_SUCCESS, TEXT_ON_DARK);
     }
 
     public static JButton dangerBtn(String text) {
-        return styledBtn(text, ALERT_RED, Color.WHITE);
+        return styledBtn(text, STATUS_ERROR, TEXT_ON_DARK);
     }
 
     public static JButton warnBtn(String text) {
-        return styledBtn(text, WARNING_AMBER, Color.WHITE);
+        return styledBtn(text, STATUS_WARNING, TEXT_ON_DARK);
     }
 
     public static JButton ghostBtn(String text) {
@@ -218,10 +248,11 @@ public final class AppTheme {
 
         JLabel lbl = new JLabel(title);
         lbl.setFont(FONT_H2);
-        lbl.setForeground(TEXT_PRIMARY);
+        lbl.setForeground(PRIMARY_DARK_RED);
         p.add(lbl, BorderLayout.WEST);
 
-        if (rightAction != null) p.add(rightAction, BorderLayout.EAST);
+        if (rightAction != null)
+            p.add(rightAction, BorderLayout.EAST);
         return p;
     }
 }

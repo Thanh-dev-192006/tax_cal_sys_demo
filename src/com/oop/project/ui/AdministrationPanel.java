@@ -19,6 +19,27 @@ import java.util.List;
 
 public class AdministrationPanel extends JPanel {
 
+    private ImageIcon loadLogo(int targetWidth, int targetHeight) {
+        ImageIcon icon = null;
+        try {
+            java.net.URL url = getClass().getResource("/logo.png");
+            if (url != null) {
+                icon = new ImageIcon(url);
+            } else {
+                icon = new ImageIcon("logo.png");
+            }
+            if (icon != null && icon.getIconWidth() > 0) {
+                Image scaled = icon.getImage().getScaledInstance(
+                    targetWidth, targetHeight, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(scaled);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo not found: " + e.getMessage());
+        }
+        return null;
+    }
+
     private final User           currentUser;
     private final UserRepository userRepository;
     private JTable         table;
@@ -46,9 +67,16 @@ public class AdministrationPanel extends JPanel {
         p.setBackground(AppTheme.WARM_BG);
         p.setBorder(new EmptyBorder(AppTheme.PAD_LG, AppTheme.PAD_LG, AppTheme.PAD_MD, AppTheme.PAD_LG));
 
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        titlePanel.setOpaque(false);
+        ImageIcon logoIcon = loadLogo(28, 28);
+        if (logoIcon != null) {
+            titlePanel.add(new JLabel(logoIcon));
+        }
         JLabel title = new JLabel("Administration");
         title.setFont(AppTheme.FONT_H1);
-        title.setForeground(AppTheme.TEXT_PRIMARY);
+        title.setForeground(AppTheme.PRIMARY_DARK_RED);
+        titlePanel.add(title);
 
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         JLabel info = new JLabel("Session: " + currentUser.getUsername() + "  ·  " + currentUser.getRole() + "  ·  " + time);
@@ -64,7 +92,7 @@ public class AdministrationPanel extends JPanel {
 
         JPanel left = new JPanel(new BorderLayout(0, 4));
         left.setOpaque(false);
-        left.add(title, BorderLayout.NORTH);
+        left.add(titlePanel, BorderLayout.NORTH);
         left.add(info,  BorderLayout.SOUTH);
 
         p.add(left,  BorderLayout.WEST);
