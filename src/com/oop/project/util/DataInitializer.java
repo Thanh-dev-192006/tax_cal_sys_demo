@@ -22,10 +22,10 @@ public class DataInitializer {
         } else {
             System.err.println("✗ Database connection FAILED!");
             System.err.println("✗ Please check:");
-            System.err.println("  1. MySQL server is running");
-            System.err.println("  2. Database 'tax_return_system' exists");
-            System.err.println("  3. URL/username/password (now read from system properties) are correct");
-            System.err.println("  4. MySQL JDBC driver is in classpath");
+            System.err.println("  1. The database server is running");
+            System.err.println("  2. The target database exists");
+            System.err.println("  3. Values in config.properties are correct");
+            System.err.println("  4. The JDBC driver is available in the classpath");
             // For additional diagnostics, attempt a direct connection to print stacktrace
             try {
                 DatabaseUtil.getConnection();
