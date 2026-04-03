@@ -11,6 +11,7 @@ import java.sql.SQLException;
  */
 public final class DatabaseUtil {
 
+    private static final String MYSQL_DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String URL = ConfigLoader.getDbUrl();
     private static final String USERNAME = ConfigLoader.getDbUser();
     private static final String PASSWORD = ConfigLoader.getDbPassword();
@@ -66,15 +67,9 @@ public final class DatabaseUtil {
     }
 
     private static String inferDriverClassName(String jdbcUrl) {
-        if (jdbcUrl == null) {
-            return null;
+        if (jdbcUrl != null && jdbcUrl.startsWith("jdbc:mysql:")) {
+            return MYSQL_DRIVER_CLASS_NAME;
         }
-        if (jdbcUrl.startsWith("jdbc:mysql:")) {
-            return "com.mysql.cj.jdbc.Driver";
-        }
-        if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-            return "org.postgresql.Driver";
-        }
-        return null;
+        throw new IllegalStateException("Only MySQL JDBC URLs are supported. Current db.url: " + jdbcUrl);
     }
 }
