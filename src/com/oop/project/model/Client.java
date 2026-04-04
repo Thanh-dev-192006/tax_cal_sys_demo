@@ -6,7 +6,7 @@ public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Original fields (giu nguyen de tuong thich)
-    private String id;              // Tax ID (SSN format: XXX-XX-XXXX)
+    private String id;              // Tax ID (9 digits)
     private String name;            // Full name
     private double income;          // Monthly income
     private String maritalStatus;   // SINGLE, MARRIED, DIVORCED, WIDOWED

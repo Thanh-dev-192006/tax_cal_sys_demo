@@ -6,14 +6,13 @@ import com.oop.project.service.ClientService;
 import com.oop.project.util.AppTheme;
 import com.oop.project.util.CsvExporter;
 import com.oop.project.util.VndFormatter;
-
+import java.awt.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.List;
 
 public class ClientPanel extends JPanel {
 
@@ -141,7 +140,7 @@ public class ClientPanel extends JPanel {
 
         // Row 0 — Tax ID | Name
         lc.gridx = 0; lc.gridy = 0;
-        grid.add(lbl("Tax ID (XXX-XX-XXXX):"), lc);
+        grid.add(lbl("Tax ID (9 digits):"), lc);
         fc.gridx = 1; fc.gridy = 0;
         fldId = field("e.g. 123-45-6789", 14);
         grid.add(fldId, fc);

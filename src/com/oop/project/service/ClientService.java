@@ -3,7 +3,7 @@ package com.oop.project.service;
 import com.oop.project.exception.InvalidDataException;
 import com.oop.project.model.Client;
 import com.oop.project.repository.ClientRepository;
-
+import com.oop.project.util.ValidationUtil;
 import java.util.List;
 
 public class ClientService {
@@ -49,9 +49,9 @@ public class ClientService {
         if (client.getIncome() < 0) {
             throw new InvalidDataException("Income cannot be negative");
         }
-        // Validate SSN format (simple check)
-        if (!client.getId().matches("\\d{3}-\\d{2}-\\d{4}")) {
-            throw new InvalidDataException("Invalid SSN format");
+        // Validate Tax ID format (9 digits)
+        if (!ValidationUtil.isValidTaxID(client.getId())) {
+            throw new InvalidDataException("Invalid Tax ID format. Must be 9 digits.");
         }
     }
 }
