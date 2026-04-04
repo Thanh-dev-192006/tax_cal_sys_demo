@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 public final class DatabaseConfig {
 
     private static final Logger LOG = Logger.getLogger(DatabaseConfig.class.getName());
+    private static final String MYSQL_DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
     private static volatile HikariDataSource dataSource;
 
     private DatabaseConfig() {}
@@ -92,23 +93,13 @@ public final class DatabaseConfig {
         config.setMaxLifetime(ConfigLoader.getIntProperty("db.pool.max.lifetime", 1800000));
         config.setPoolName("TaxCalSysPool");
 
-        if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-            config.addDataSourceProperty("reWriteBatchedInserts", "true");
-        }
-
         return new HikariDataSource(config);
     }
 
     private static String inferDriverClassName(String jdbcUrl) {
-        if (jdbcUrl == null) {
-            return null;
+        if (jdbcUrl != null && jdbcUrl.startsWith("jdbc:mysql:")) {
+            return MYSQL_DRIVER_CLASS_NAME;
         }
-        if (jdbcUrl.startsWith("jdbc:mysql:")) {
-            return "com.mysql.cj.jdbc.Driver";
-        }
-        if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-            return "org.postgresql.Driver";
-        }
-        return null;
+        throw new IllegalStateException("Only MySQL JDBC URLs are supported. Current db.url: " + jdbcUrl);
     }
 }

@@ -228,12 +228,7 @@ public class LoginFrame extends JFrame {
         form.add(loginButton);
         form.add(Box.createVerticalStrut(14));
 
-        // Hint
-        JLabel hint = new JLabel("<html><span style='color:#757575'>Admin: admin / admin123 &nbsp;·&nbsp; Staff: nhanvien1 / Staff@123</span></html>");
-        hint.setFont(new Font("Segoe UI", Font.ITALIC, 10));
-        hint.setAlignmentX(Component.LEFT_ALIGNMENT);
-        form.add(hint);
-
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
