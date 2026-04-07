@@ -3,43 +3,11 @@ package com.oop.project.util;
 public class ValidationUtil {
 
     /**
-     * Validate SSN format: XXX-XX-XXXX
-     * Vi du: 903-73-9276
-     */
-    public static boolean isValidSSN(String ssn) {
-        return ssn != null && ssn.matches("\\d{3}-\\d{2}-\\d{4}");
-    }
-    
-    /**
-     * Validate Tax ID format: 10 digits (no dashes)
-     * Vi du: 9037392763
+     * Validate Tax ID format: 9 digits
+     * Vi du: 903739276
      */
     public static boolean isValidTaxID(String taxId) {
-        return taxId != null && taxId.matches("\\d{10}");
-    }
-    
-    /**
-     * Convert Tax ID (10 digits) to SSN format (XXX-XX-XXXX)
-     * Vi du: 9037392763 -> 903-73-9276
-     */
-    public static String taxIdToSSN(String taxId) {
-        if (taxId == null || taxId.length() != 10) {
-            return taxId;
-        }
-        return  taxId.substring(0, 3) + "-" + 
-                taxId.substring(3, 5) + "-" + 
-                taxId.substring(5);
-    }
-    
-    /**
-     * Convert SSN format (XXX-XX-XXXX) to Tax ID (10 digits)
-     * Vi du: 903-73-9276 -> 9037392763
-     */
-    public static String ssnToTaxId(String ssn) {
-        if (ssn == null) {
-            return ssn;
-        }
-        return ssn.replace("-", "");
+        return taxId != null && taxId.matches("\\d{9}");
     }
 
     /**
