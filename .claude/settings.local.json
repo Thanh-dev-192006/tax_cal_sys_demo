@@ -18,7 +18,13 @@
       "Bash(cd D:/tax_cal_sys_demo && powershell -Command \"mvn compile\" 2>&1)",
       "Bash(where mvn.cmd 2>nul || where mvn.bat 2>nul || dir \"C:\\\\Program Files\\\\*maven*\" /b /s 2>nul | head -5)",
       "Bash(cd D:/tax_cal_sys_demo && mkdir -p bin && javac -encoding UTF-8 -source 17 -target 17 -cp \"lib/*\" -d bin src/com/oop/project/util/AppTheme.java src/com/oop/project/exception/*.java src/com/oop/project/model/*.java src/com/oop/project/repository/*.java src/com/oop/project/service/*.java src/com/oop/project/ui/*.java src/com/oop/project/util/*.java src/com/oop/project/Main.java 2>&1)",
-      "Bash(cd D:/tax_cal_sys_demo && java -cp \"lib/*;bin\" com.oop.project.Main 2>&1)"
+      "Bash(cd D:/tax_cal_sys_demo && java -cp \"lib/*;bin\" com.oop.project.Main 2>&1)",
+      "Bash(docker --version)",
+      "Bash(docker compose:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":3306\")",
+      "Bash(docker exec tax-cal-app:*)",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec tax-cal-app:*)"
     ]
   }
 }
