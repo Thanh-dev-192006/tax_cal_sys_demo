@@ -26,5 +26,6 @@ public class Main {
         DataInitializer.initializeSampleData();
 
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+        
     }
 }
