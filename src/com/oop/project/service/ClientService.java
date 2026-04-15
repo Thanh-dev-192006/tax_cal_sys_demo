@@ -5,6 +5,9 @@ import com.oop.project.model.Client;
 import com.oop.project.repository.ClientRepository;
 import com.oop.project.util.ValidationUtil;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClientService {
     private ClientRepository clientRepository;
@@ -37,6 +40,26 @@ public class ClientService {
 
     public List<Client> getAllClients() {
         return clientRepository.loadClients();
+    }
+
+    /**
+     * Tự động sinh Tax ID 9 chữ số ngẫu nhiên, đảm bảo không trùng với ID đã có.
+     */
+    public String generateUniqueId() {
+        List<Client> existing = clientRepository.loadClients();
+        Set<String> usedIds = existing.stream()
+                .map(Client::getId)
+                .collect(Collectors.toSet());
+
+        Random rng = new Random();
+        String candidate;
+        do {
+            // Sinh số từ 100_000_000 đến 999_999_999 (luôn đủ 9 chữ số)
+            int num = 100_000_000 + rng.nextInt(900_000_000);
+            candidate = String.valueOf(num);
+        } while (usedIds.contains(candidate));
+
+        return candidate;
     }
 
     private void validateClient(Client client) throws InvalidDataException {

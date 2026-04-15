@@ -1,26 +1,14 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
             "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "tax_cal_sys_demo (1)_a3477c9f"
-        },
-        {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "tax_cal_sys_demo_8bac75f3"
-        },
-        {
-            "type": "java",
-            "name": "Main",
+            "name": "Launch Main",
             "request": "launch",
             "mainClass": "com.oop.project.Main",
             "classPaths": [
-                "${workspaceFolder}/bin"
+                "${workspaceFolder}/bin",
+                "${workspaceFolder}/lib/*"
             ],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "build"

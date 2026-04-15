@@ -10,32 +10,45 @@ import java.util.Properties;
 public final class ConfigLoader {
 
     private static final String CONFIG_FILE_NAME = "config.properties";
+    private static final String LEGACY_CONFIG_FILE_NAME = "application.properties";
     private static final Properties PROPERTIES = loadProperties();
 
     private ConfigLoader() {}
 
     private static Properties loadProperties() {
         Properties properties = new Properties();
-        Path configPath = Paths.get(CONFIG_FILE_NAME);
+        loadPropertiesFromPath(properties, Paths.get(CONFIG_FILE_NAME));
+        if (properties.isEmpty()) {
+            loadPropertiesFromPath(properties, Paths.get(LEGACY_CONFIG_FILE_NAME));
+        }
+        if (properties.isEmpty()) {
+            loadPropertiesFromResource(properties, CONFIG_FILE_NAME);
+        }
+        if (properties.isEmpty()) {
+            loadPropertiesFromResource(properties, LEGACY_CONFIG_FILE_NAME);
+        }
+        return properties;
+    }
 
-        try {
-            if (Files.exists(configPath)) {
-                try (InputStream inputStream = Files.newInputStream(configPath)) {
-                    properties.load(inputStream);
-                }
-            } else {
-                try (InputStream inputStream = ConfigLoader.class.getClassLoader()
-                        .getResourceAsStream(CONFIG_FILE_NAME)) {
-                    if (inputStream != null) {
-                        properties.load(inputStream);
-                    }
-                }
+    private static void loadPropertiesFromPath(Properties properties, Path path) {
+        if (!Files.exists(path)) {
+            return;
+        }
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load " + path.getFileName(), e);
+        }
+    }
+
+    private static void loadPropertiesFromResource(Properties properties, String resourceName) {
+        try (InputStream inputStream = ConfigLoader.class.getClassLoader().getResourceAsStream(resourceName)) {
+            if (inputStream != null) {
+                properties.load(inputStream);
             }
         } catch (IOException e) {
-            throw new IllegalStateException("Could not load " + CONFIG_FILE_NAME, e);
+            throw new IllegalStateException("Could not load resource " + resourceName, e);
         }
-
-        return properties;
     }
 
     public static String getProperty(String key) {
