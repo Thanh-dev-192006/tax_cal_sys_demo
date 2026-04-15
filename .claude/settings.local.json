@@ -24,7 +24,10 @@
       "Bash(netstat -ano)",
       "Bash(findstr \":3306\")",
       "Bash(docker exec tax-cal-app:*)",
-      "Bash(MSYS_NO_PATHCONV=1 docker exec tax-cal-app:*)"
+      "Bash(MSYS_NO_PATHCONV=1 docker exec tax-cal-app:*)",
+      "Bash(cmd /c \"rmdir /s /q target && rmdir /s /q out 2>nul\")",
+      "Bash(cmd /c \"rmdir /s /q target 2>nul & rmdir /s /q ai66a-p06-tax-return 2>nul & rmdir /s /q tax_cal_sys_demo 2>nul\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force target -ErrorAction SilentlyContinue; Remove-Item -Recurse -Force ai66a-p06-tax-return -ErrorAction SilentlyContinue; Remove-Item -Recurse -Force tax_cal_sys_demo -ErrorAction SilentlyContinue\")"
     ]
   }
 }
