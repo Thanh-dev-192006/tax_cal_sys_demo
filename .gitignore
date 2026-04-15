@@ -1,5 +1,6 @@
 # Ignore compiled Java classes
 bin/
+out/
+target/
 *.class
-bin/**/*.class
 config.properties
