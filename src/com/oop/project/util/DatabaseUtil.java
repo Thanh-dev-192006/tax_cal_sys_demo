@@ -1,7 +1,6 @@
 package com.oop.project.util;
 
 import com.oop.project.config.ConfigLoader;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,38 +11,45 @@ import java.sql.SQLException;
 public final class DatabaseUtil {
 
     private static final String MYSQL_DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
-    private static final String URL = ConfigLoader.getDbUrl();
-    private static final String USERNAME = ConfigLoader.getDbUser();
-    private static final String PASSWORD = ConfigLoader.getDbPassword();
 
     private DatabaseUtil() {}
 
-    static {
-        String driverClassName = inferDriverClassName(URL);
-        if (driverClassName != null) {
-            try {
-                Class.forName(driverClassName);
-                System.out.println("JDBC driver loaded successfully: " + driverClassName);
-            } catch (ClassNotFoundException e) {
-                System.err.println("JDBC driver not found: " + driverClassName);
-                System.err.println("Make sure the correct driver JAR is on the classpath.");
-                e.printStackTrace();
-            }
-        }
+    private static String getUrl() {
+        return ConfigLoader.getDbUrl();
+    }
+
+    private static String getUsername() {
+        return ConfigLoader.getDbUser();
+    }
+
+    private static String getPassword() {
+        return ConfigLoader.getDbPassword();
     }
 
     public static Connection getConnection() throws SQLException {
+        String url = getUrl();
+        String username = getUsername();
+        String password = getPassword();
+        String driverClassName = inferDriverClassName(url);
+
         try {
-            Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            if (driverClassName != null) {
+                Class.forName(driverClassName);
+            }
+
+            Connection conn = DriverManager.getConnection(url, username, password);
             System.out.println("Connected to database successfully");
             return conn;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Failed to connect to database");
-            System.err.println("URL: " + URL);
-            System.err.println("User: " + USERNAME);
+            System.err.println("URL: " + url);
+            System.err.println("User: " + username);
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace(System.err);
-            throw e;
+            if (e instanceof SQLException sqlEx) {
+                throw sqlEx;
+            }
+            throw new SQLException("Database connection failed", e);
         }
     }
 

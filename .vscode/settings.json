@@ -1,8 +1,10 @@
-{
+﻿{
     "java.project.sourcePaths": [
-        "Demo_TaxReturn_Systems/oop/project",
-        "src/com/oop/project"
+        "src"
     ],
     "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/*.jar"
+    ],
     "java.debug.settings.onBuildFailureProceed": true
 }

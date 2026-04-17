@@ -142,8 +142,15 @@ public class ClientPanel extends JPanel {
         lc.gridx = 0; lc.gridy = 0;
         grid.add(lbl("Tax ID (9 digits):"), lc);
         fc.gridx = 1; fc.gridy = 0;
-        fldId = field("e.g. 123-45-6789", 14);
-        grid.add(fldId, fc);
+        fldId = field("e.g. 123456789", 11);
+        JButton btnGenId = AppTheme.ghostBtn("⟳ Generate");
+        btnGenId.setToolTipText("Tự động sinh Tax ID 9 chữ số duy nhất");
+        btnGenId.addActionListener(e -> fldId.setText(clientService.generateUniqueId()));
+        JPanel idPanel = new JPanel(new BorderLayout(4, 0));
+        idPanel.setOpaque(false);
+        idPanel.add(fldId,    BorderLayout.CENTER);
+        idPanel.add(btnGenId, BorderLayout.EAST);
+        grid.add(idPanel, fc);
 
         lc.gridx = 2; lc.gridy = 0;
         grid.add(lbl("Full Name:"), lc);

@@ -7,7 +7,9 @@
             "command": "javac",
             "args": [
                 "-encoding", "UTF-8",
+                "-classpath", "lib/*",
                 "-d", "bin",
+                "src/com/oop/project/config/*.java",
                 "src/com/oop/project/Main.java",
                 "src/com/oop/project/exception/*.java",
                 "src/com/oop/project/model/*.java",
